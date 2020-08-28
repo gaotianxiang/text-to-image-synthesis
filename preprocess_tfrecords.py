@@ -299,7 +299,7 @@ class EmbeddingConditionedDataset(TFRecordDataset):
         """Gets a TFExample.
 
         Args:
-            img:
+            img: tf.uint8
             embedding:
             caption:
 
