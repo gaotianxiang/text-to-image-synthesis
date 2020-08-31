@@ -109,7 +109,7 @@ def _unbatch(dtst_name, dtst):
     return dtst.unbatch()
 
 
-def _process_dataset(dtst, dtst_name, num_captions_per_image, process_func):
+def _process_dataset(dtst, dtst_name, num_captions_per_image, process_func, shuffle):
     """Processes the TFRecord dataset.
 
     Args:
@@ -117,6 +117,7 @@ def _process_dataset(dtst, dtst_name, num_captions_per_image, process_func):
         dtst_name:
         num_captions_per_image:
         process_func:
+        shuffle:
 
     Returns:
         A processed TF dataset.
@@ -126,6 +127,8 @@ def _process_dataset(dtst, dtst_name, num_captions_per_image, process_func):
     dtst = _unbatch(dtst_name, dtst)
     if process_func is not None:
         dtst = dtst.map(process_func, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    if shuffle:
+        dtst = dtst.shuffle(buffer_size=50000)
     return dtst
 
 
@@ -145,7 +148,7 @@ def _batchify(dtst, batch_size, drop_remainder):
     return dtst.batch(batch_size, drop_remainder).prefetch(tf.data.experimental.AUTOTUNE)
 
 
-def get_data_loader(dataset_name, tfrecord_dir, num_caption_per_image, process_func, batch_size, drop_remainder):
+def get_data_loader(dataset_name, tfrecord_dir, num_caption_per_image, process_func, shuffle, batch_size, drop_remainder):
     """Gets data loader.
 
     Args:
@@ -153,6 +156,7 @@ def get_data_loader(dataset_name, tfrecord_dir, num_caption_per_image, process_f
         tfrecord_dir:
         num_caption_per_image:
         process_func:
+        shuffle:
         batch_size:
         drop_remainder:
 
@@ -160,6 +164,6 @@ def get_data_loader(dataset_name, tfrecord_dir, num_caption_per_image, process_f
         A TF dataset.
     """
     dtst = _get_tf_record_dataset(tfrecord_dir)
-    dtst = _process_dataset(dtst, dataset_name, num_caption_per_image, process_func)
+    dtst = _process_dataset(dtst, dataset_name, num_caption_per_image, process_func, shuffle)
     dtst = _batchify(dtst, batch_size, drop_remainder)
     return dtst
