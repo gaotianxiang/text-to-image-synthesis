@@ -2,7 +2,13 @@
 
 import tensorflow as tf
 
-from model_factory import Model
+from global_string import GAN_DISC_LOSS
+from global_string import GAN_DISC_LOSS_FUNC
+from global_string import GAN_DISC_OPTIM
+from global_string import GAN_GEN_LOSS
+from global_string import GAN_GEN_LOSS_FUNC
+from global_string import GAN_GEN_OPTIM
+from model_interface import Model
 
 
 class ClassConditionedGenerator(tf.keras.layers.Layer):
@@ -163,7 +169,7 @@ class ClassConditionedDiscriminator(tf.keras.layers.Layer):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.LeakyReLU(),
 
-            tf.keras.layers.Conv2D(1, [7, 7], strides=1, padding='valid', activation='tanh'),
+            tf.keras.layers.Conv2D(1, [7, 7], strides=1, padding='valid'),
             tf.keras.layers.Flatten()
         ])
 
@@ -227,7 +233,7 @@ class EmbeddingConditionedDiscriminator(tf.keras.layers.Layer):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.LeakyReLU(),
 
-            tf.keras.layers.Conv2D(1, [4, 4], strides=1, padding='valid', activation='tanh'),
+            tf.keras.layers.Conv2D(1, [4, 4], strides=1, padding='valid'),
             tf.keras.layers.Flatten()
         ])
         if use_condition:
@@ -306,10 +312,10 @@ class GAN(Model):
 
         """
         image, embedding, _ = inputs
-        generator_loss_func = loss_function['generator_loss']
-        discriminator_loss_func = loss_function['discriminator_loss']
-        generator_optimizer = optimizer['generator']
-        discriminator_optimizer = optimizer['discriminator']
+        generator_loss_func = loss_function[GAN_GEN_LOSS_FUNC]
+        discriminator_loss_func = loss_function[GAN_DISC_LOSS_FUNC]
+        generator_optimizer = optimizer[GAN_GEN_OPTIM]
+        discriminator_optimizer = optimizer[GAN_DISC_OPTIM]
         noise = tf.random.normal(shape=[self.batch_size, self.noise_size])
 
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
@@ -319,7 +325,7 @@ class GAN(Model):
             real_img_fake_caption = self._discriminator(image, embedding[::-1])
             fake_img_real_caption = self._discriminator(fake_image, embedding)
 
-            gen_loss = generator_loss_func(fake_img_real_caption, self.use_condition)
+            gen_loss = generator_loss_func(fake_img_real_caption)
             disc_loss = discriminator_loss_func(real_img_real_caption, real_img_fake_caption, fake_img_real_caption,
                                                 self.use_condition)
         grads_generator = gen_tape.gradient(gen_loss, self._generator.trainable_variables)
@@ -328,32 +334,25 @@ class GAN(Model):
         generator_optimizer.apply_gradients(zip(grads_generator, self._generator.trainable_variables))
         discriminator_optimizer.apply_gradients(zip(grads_discriminator, self._discriminator.trainable_variables))
 
-        return {'gen_loss': gen_loss, 'disc_loss': disc_loss}
+        return {GAN_GEN_LOSS: gen_loss, GAN_DISC_LOSS: disc_loss}
 
-    def generate(self, use_condition, ground_truth_img, embedding, caption, num, num_per_caption, visualize_tool,
-                 output_dir):
+    def generate(self, embedding, num, num_per_caption):
         """Generates images.
 
         Args:
-            use_condition: Whether to do conditional generation.
-            ground_truth_img: Ground truth images.
             embedding: Text embeddings.
-            caption: Captions.
             num: Number of samplings. Ignored if the use_condition is true.
             num_per_caption: Number of samplings per caption. Ignored if the use_condition is false.
-            visualize_tool: A visualize tool.
-            output_dir: Directory to which the generated images will be stored.
 
         Returns:
 
         """
-        if not use_condition:
+        if not self.use_condition:
             noise = tf.random.normal(shape=[num, self.noise_size])
-            img = self._generator(noise, None)
-            visualize_tool(img, None, ground_truth_img, use_condition, output_dir)
+            fake_img = self._generator(noise, embedding)
         else:
             num = embedding.shape[0]
             noise = tf.random.normal(shape=[num_per_caption * num, self.noise_size])
             embedding = tf.tile(embedding, multiples=[num_per_caption, 1])
             fake_img = self._generator(noise, embedding)
-            visualize_tool(fake_img, caption, ground_truth_img, use_condition, output_dir)
+        return fake_img
