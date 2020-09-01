@@ -356,3 +356,6 @@ class GAN(Model):
             embedding = tf.tile(embedding, multiples=[num_per_caption, 1])
             fake_img = self._generator(noise, embedding)
         return fake_img
+
+    def __str__(self):
+        return 'gan'
