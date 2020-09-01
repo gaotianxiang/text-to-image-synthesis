@@ -72,6 +72,21 @@ def _write_summary(summary_writer, loss, step):
             tf.summary.scalar(name, val, step)
 
 
+def _get_iterations(optimizer):
+    """Returns number of iterations the optimizer has run.
+
+    Args:
+        optimizer:
+
+    Returns:
+
+    """
+    if isinstance(optimizer, dict):
+        v = list(optimizer.values())[0]
+        return v.iterations
+    return optimizer.iterations
+
+
 def _save_img(fake_image, grid, output_dir):
     """Saves images to file.
 
@@ -115,7 +130,7 @@ def train(model, loss_func, metrics, optimizer, data_loader, ckpt_manager, summa
 
             if step % print_interval == 0:
                 metrics.print_info(epoch + 1, step)
-                _write_summary(summary_writer, loss, step=optimizer.iterations)
+                _write_summary(summary_writer, loss, step=_get_iterations(optimizer))
         metrics.print_info(epoch + 1, None)
         print('Epoch {}. Execution time {:.4f} seconds.\n'.format(epoch + 1, time.time() - start))
         ckpt_manager.save()
