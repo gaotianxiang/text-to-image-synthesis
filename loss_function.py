@@ -6,7 +6,7 @@ from global_string import GAN_DISC_LOSS_FUNC
 from global_string import GAN_GEN_LOSS_FUNC
 
 
-class GANGeneratorLoss(tf.keras.losses.Loss):
+class GANGeneratorLoss:
     """GAN generator loss.
 
     Attributes:
@@ -18,12 +18,11 @@ class GANGeneratorLoss(tf.keras.losses.Loss):
         super().__init__()
         self._binary_cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True, reduction='none')
 
-    def call(self, fake_img_real_caption, use_condition):
+    def __call__(self, fake_img_real_caption):
         """Calculates the loss value.
 
         Args:
             fake_img_real_caption:
-            use_condition:
 
         Returns:
             Average loss over batch size.
@@ -32,7 +31,7 @@ class GANGeneratorLoss(tf.keras.losses.Loss):
         return tf.reduce_mean(loss)
 
 
-class GANDiscriminatorLoss(tf.keras.losses.Loss):
+class GANDiscriminatorLoss:
     """GAN discriminator loss.
 
     Attributes:
@@ -44,7 +43,7 @@ class GANDiscriminatorLoss(tf.keras.losses.Loss):
         super().__init__()
         self._binary_cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True, reduction='none')
 
-    def call(self, real_img_real_caption, real_img_fake_caption, fake_img_real_caption, use_condition):
+    def __call__(self, real_img_real_caption, real_img_fake_caption, fake_img_real_caption, use_condition):
         """Calculates the loss value.
 
         Args:
