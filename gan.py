@@ -144,6 +144,7 @@ class ClassConditionedDiscriminator(tf.keras.layers.Layer):
     Attributes:
         _use_condition:
         _model:
+        _intermediate_layer:
         _final_layer
     """
 
@@ -164,13 +165,17 @@ class ClassConditionedDiscriminator(tf.keras.layers.Layer):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.LeakyReLU(),
         ])
-        self._final_layer = tf.keras.Sequential([
-            tf.keras.layers.Conv2D(128, [1, 1], strides=1, padding='same'),
-            tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.LeakyReLU(),
 
-            tf.keras.layers.Conv2D(1, [7, 7], strides=1, padding='valid'),
-            tf.keras.layers.Flatten()
+        if use_condition:
+            self._intermediate_layer = tf.keras.Sequential([
+                tf.keras.layers.Conv2D(128, [1, 1], strides=1, padding='same'),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.LeakyReLU(),
+            ])
+
+        self._final_layer = tf.keras.Sequential([
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(1)
         ])
 
     def call(self, image, embedding):
@@ -189,6 +194,7 @@ class ClassConditionedDiscriminator(tf.keras.layers.Layer):
             embedding = tf.expand_dims(embedding, 1)
             embedding = tf.tile(embedding, multiples=[1, 7, 7, 1])
             x = tf.concat([x, embedding], axis=-1)
+            x = self._intermediate_layer(x)
         x = self._final_layer(x)
         return x
 
