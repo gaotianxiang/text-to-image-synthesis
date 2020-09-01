@@ -17,7 +17,7 @@ def _process_mnist(image, label):
     image = (image - 127.5) / 127.5
     image = tf.expand_dims(image, axis=-1)
     label = tf.one_hot(label, 10)
-    return image, label, None
+    return image, label, 0
 
 
 def get_process_func(dtst_name):
