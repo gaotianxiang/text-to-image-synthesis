@@ -31,4 +31,6 @@ def get_process_func(dtst_name):
     """
     if dtst_name == 'mnist':
         return _process_mnist
+    elif dtst_name == 'fmnist':
+        return _process_mnist
     raise ValueError('Dataset {} is not supported'.format(dtst_name))
