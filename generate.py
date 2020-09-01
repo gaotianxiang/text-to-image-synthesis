@@ -46,7 +46,7 @@ def main(argv):
                                   batch_size=FLAGS.batch_size, drop_remainder=FLAGS.drop_remainder)
     model = get_model(model_name=FLAGS.model, dtst_name=FLAGS.dtst_name, use_condition=FLAGS.use_condition,
                       batch_size=FLAGS.batch_size, noise_size=FLAGS.noise_size, compression_size=FLAGS.compression_size)
-    ckpt, ckpt_manager = set_up_ckpt(model, None, None, FLAGS.ckpt_dir, 1)
+    ckpt, ckpt_manager = set_up_ckpt(model, None, None, FLAGS.ckpt_dir, 1, generate=True)
     ckpt.restore(ckpt_manager.latest_checkpoint).expect_partial()
     visualize_tool = get_visualize_tool(FLAGS.visualize_tool)
     generate(model, data_loader, num=FLAGS.num,

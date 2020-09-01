@@ -26,7 +26,7 @@ def get_optimizer(model, learning_rate):
     raise ValueError('Model {} is not supported.'.format(model))
 
 
-def set_up_ckpt(model, data_loader, optimizer, ckpt_dir, num_ckpt_saved):
+def set_up_ckpt(model, data_loader, optimizer, ckpt_dir, num_ckpt_saved, generate=False):
     """Sets up the ckeckpoint and ckeckpoint manager.
 
     Args:
@@ -35,11 +35,15 @@ def set_up_ckpt(model, data_loader, optimizer, ckpt_dir, num_ckpt_saved):
         optimizer:
         ckpt_dir:
         num_ckpt_saved:
+        generate:
 
     Returns:
         A checkpoint manager.
     """
-    ckpt = tf.train.Checkpoint(model=model, data_loader=data_loader, optimizer=optimizer)
+    if generate:
+        ckpt = tf.train.Checkpoint(model=model)
+    else:
+        ckpt = tf.train.Checkpoint(model=model, data_loader=data_loader, optimizer=optimizer)
     manager = tf.train.CheckpointManager(ckpt, ckpt_dir, max_to_keep=num_ckpt_saved)
     return ckpt, manager
 
