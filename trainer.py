@@ -157,5 +157,5 @@ def generate(model, data_loader, num, num_per_caption, visualize_tool, num_per_r
     """
     real_img, embedding, caption = next(data_loader)
     fake_img = model.generate(embedding, num, num_per_caption)
-    fake_img, grid = visualize_tool(fake_img, real_img, caption, num, num_per_caption, num_per_row, model)
+    fake_img, grid = visualize_tool(fake_img, real_img, caption, num, num_per_caption, num_per_row, str(model))
     _save_img(fake_img, grid, output_dir)

@@ -36,3 +36,6 @@ class Model(tf.keras.Model):
 
     def generate(self, embedding, num, num_per_caption):
         raise NotImplementedError
+
+    def __str__(self):
+        raise NotImplementedError
