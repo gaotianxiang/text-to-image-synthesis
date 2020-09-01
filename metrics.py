@@ -64,5 +64,5 @@ def get_metrics(model):
         A metric object.
     """
     if model == 'gan':
-        return {GAN_GEN_LOSS: tf.keras.metrics.Mean(), GAN_DISC_LOSS: tf.keras.metrics.Mean()}
+        return Metrics({GAN_GEN_LOSS: tf.keras.metrics.Mean(), GAN_DISC_LOSS: tf.keras.metrics.Mean()})
     raise ValueError('Model {} is not supported.'.format(model))
