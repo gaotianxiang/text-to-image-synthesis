@@ -1,7 +1,9 @@
 """Model interfaces."""
 
+import tensorflow as tf
 
-class Model:
+
+class Model(tf.keras.Model):
     """Model interfaces for all generative models.
 
     Attributes:
@@ -13,6 +15,7 @@ class Model:
     """
 
     def __init__(self, dtst_name, compression_size, noise_size, batch_size, use_condition):
+        super().__init__()
         """Initializes the object.
 
         Args:
