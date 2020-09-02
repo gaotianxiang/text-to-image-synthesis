@@ -42,4 +42,6 @@ def get_process_func(dtst_name):
         return _process_mnist
     elif dtst_name == 'cub':
         return _process_flowers
+    elif dtst_name == 'flower':
+        return _process_flowers
     raise ValueError('Dataset {} is not supported'.format(dtst_name))

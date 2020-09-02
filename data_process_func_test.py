@@ -91,6 +91,30 @@ class DataProcessFuncTest(unittest.TestCase):
             self.assertEqual(caption.shape, [self.batch_size])
             self.assertEqual(caption.dtype, tf.string)
 
+    def test_flower_train(self):
+        data_loader = get_data_loader('flower', FLOWERS_TRAIN, 10, process_func=get_process_func('flower'), shuffle=True,
+                                      batch_size=self.batch_size, drop_remainder=self.drop_remainder)
+
+        for img, embedding, caption in data_loader:
+            self.assertEqual(img.shape, [self.batch_size, 64, 64, 3])
+            self.assertEqual(img.dtype, tf.float32)
+            self.assertEqual(embedding.shape, [self.batch_size, 1024])
+            self.assertEqual(embedding.dtype, tf.float32)
+            self.assertEqual(caption.shape, [self.batch_size])
+            self.assertEqual(caption.dtype, tf.string)
+
+    def test_flower_val(self):
+        data_loader = get_data_loader('flower', FLOWERS_VAL, 10, process_func=get_process_func('flower'), shuffle=False,
+                                      batch_size=self.batch_size, drop_remainder=self.drop_remainder)
+
+        for img, embedding, caption in data_loader:
+            self.assertEqual(img.shape, [self.batch_size, 64, 64, 3])
+            self.assertEqual(img.dtype, tf.float32)
+            self.assertEqual(embedding.shape, [self.batch_size, 1024])
+            self.assertEqual(embedding.dtype, tf.float32)
+            self.assertEqual(caption.shape, [self.batch_size])
+            self.assertEqual(caption.dtype, tf.string)
+
 
 if __name__ == '__main__':
     unittest.main()
