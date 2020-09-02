@@ -59,9 +59,9 @@ class GANDiscriminatorLoss:
         if not use_condition:
             fake_loss = self._binary_cross_entropy(tf.zeros_like(fake_img_real_caption), fake_img_real_caption)
         else:
-            fake_loss = (self._binary_cross_entropy(tf.zeros_like(fake_img_real_caption), fake_img_real_caption) + \
+            fake_loss = (self._binary_cross_entropy(tf.zeros_like(fake_img_real_caption), fake_img_real_caption) +
                          self._binary_cross_entropy(tf.zeros_like(real_img_fake_caption), real_img_fake_caption)) / 2
-        return tf.reduce_mean(real_loss) + tf.reduce_mean(fake_loss)
+        return (tf.reduce_mean(real_loss) + tf.reduce_mean(fake_loss)) / 2
 
 
 def get_loss_func(model):
