@@ -14,8 +14,8 @@ FMNIST_VAL = '/home/tianxiang/datasets/tfrecords/fmnist/val/'
 CUB_TRAIN = '/home/tianxiang/datasets/tfrecords/cub/train/'
 CUB_VAL = '/home/tianxiang/datasets/tfrecords/cub/val/'
 
-FLOWER_TRAIN = '/home/tianxiang/datasets/tfrecords/flowers/train/'
-FLOWER_VAL = '/home/tianxiang/datasets/tfrecords/flowers/val/'
+FLOWER_TRAIN = '/home/tianxiang/datasets/tfrecords/flower/train/'
+FLOWER_VAL = '/home/tianxiang/datasets/tfrecords/flower/val/'
 
 MSCOCO_TRAIN = '/home/tianxiang/datasets/tfrecords/mscoco/train/'
 MSCOCO_VAL = '/home/tianxiang/datasets/tfrecords/mscoco/val'

@@ -127,7 +127,7 @@ def _process_dataset(dtst, dtst_name, num_captions_per_image, num_channels, proc
     dtst = dtst.map(_tile_image(dtst_name, num_captions_per_image), num_parallel_calls=tf.data.experimental.AUTOTUNE,
                     deterministic=False)
     dtst = _unbatch(dtst_name, dtst)
-    dtst = dtst.filter(lambda img, embedding, caption: img.shape[-1] == num_channels)
+    dtst = dtst.filter(lambda *args: args[0].shape[-1] == num_channels)
     if process_func is not None:
         dtst = dtst.map(process_func, num_parallel_calls=tf.data.experimental.AUTOTUNE, deterministic=False)
     if shuffle:
