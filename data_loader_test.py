@@ -22,7 +22,7 @@ MSCOCO_VAL = '/home/tianxiang/datasets/tfrecords/mscoco/val'
 
 class DataLoaderTest(unittest.TestCase):
     def test_mnist_train(self):
-        dtst = get_data_loader('mnist', MNIST_TRAIN, None, None, 32, True)
+        dtst = get_data_loader('mnist', MNIST_TRAIN, None, None, True, 32, True)
 
         for img, l in dtst:
             self.assertEqual(len(img), len(l))
@@ -32,7 +32,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(l.dtype, tf.uint8)
 
     def test_mnist_val(self):
-        dtst = get_data_loader('mnist', MNIST_VAL, None, None, 32, True)
+        dtst = get_data_loader('mnist', MNIST_VAL, None, None, False, 32, True)
 
         for img, l in dtst:
             self.assertEqual(len(img), len(l))
@@ -42,7 +42,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(l.dtype, tf.uint8)
 
     def test_fmnist_train(self):
-        dtst = get_data_loader('fmnist', FMNIST_TRAIN, None, None, 32, True)
+        dtst = get_data_loader('fmnist', FMNIST_TRAIN, None, None, True, 32, True)
 
         for img, l in dtst:
             self.assertEqual(len(img), len(l))
@@ -52,7 +52,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(l.dtype, tf.uint8)
 
     def test_fmnist_val(self):
-        dtst = get_data_loader('fmnist', FMNIST_VAL, None, None, 32, True)
+        dtst = get_data_loader('fmnist', FMNIST_VAL, None, None, False, 32, True)
 
         for img, l in dtst:
             self.assertEqual(len(img), len(l))
@@ -62,7 +62,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(l.dtype, tf.uint8)
 
     def test_cub_train(self):
-        dtst = get_data_loader('cub', CUB_TRAIN, 10, None, None, True)
+        dtst = get_data_loader('cub', CUB_TRAIN, 10, None, True, None, True)
 
         for img, embedding, caption in dtst:
             self.assertEqual(img.dtype, tf.uint8)
@@ -72,7 +72,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(caption.dtype, tf.string)
 
     def test_cub_val(self):
-        dtst = get_data_loader('cub', CUB_VAL, 10, None, None, True)
+        dtst = get_data_loader('cub', CUB_VAL, 10, None, False, None, True)
 
         for img, embedding, caption in dtst:
             self.assertEqual(img.dtype, tf.uint8)
@@ -82,7 +82,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(caption.dtype, tf.string)
 
     def test_flowers_train(self):
-        dtst = get_data_loader('flowers', FLOWERS_TRAIN, 10, None, None, True)
+        dtst = get_data_loader('flowers', FLOWERS_TRAIN, 10, None, True, None, True)
 
         for img, embedding, caption in dtst:
             self.assertEqual(img.dtype, tf.uint8)
@@ -92,7 +92,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(caption.dtype, tf.string)
 
     def test_flowers_val(self):
-        dtst = get_data_loader('flowers', FLOWERS_VAL, 10, None, None, True)
+        dtst = get_data_loader('flowers', FLOWERS_VAL, 10, None, False, None, True)
 
         for img, embedding, caption in dtst:
             self.assertEqual(img.dtype, tf.uint8)
@@ -102,7 +102,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(caption.dtype, tf.string)
 
     def test_mscoco_train(self):
-        dtst = get_data_loader('mscoco', MSCOCO_TRAIN, 5, None, None, True)
+        dtst = get_data_loader('mscoco', MSCOCO_TRAIN, 5, None, True, None, True)
 
         for img, embedding, caption in dtst:
             self.assertEqual(img.dtype, tf.uint8)
@@ -112,7 +112,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(caption.dtype, tf.string)
 
     def test_mscoco_val(self):
-        dtst = get_data_loader('mscoco', MSCOCO_VAL, 5, None, None, True)
+        dtst = get_data_loader('mscoco', MSCOCO_VAL, 5, None, False, None, True)
 
         for img, embedding, caption in dtst:
             self.assertEqual(img.dtype, tf.uint8)
