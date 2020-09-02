@@ -20,6 +20,13 @@ def _process_mnist(image, label):
     return image, label, 0
 
 
+def _process_flowers(image, embedding, caption):
+    image = tf.image.convert_image_dtype(image, tf.float32)
+    image = tf.image.resize(image, [64, 64])
+    image = (image - 0.5) / 0.5
+    return image, embedding, caption
+
+
 def get_process_func(dtst_name):
     """Returns a dataset process function.
 
@@ -33,4 +40,6 @@ def get_process_func(dtst_name):
         return _process_mnist
     elif dtst_name == 'fmnist':
         return _process_mnist
+    elif dtst_name == 'cub':
+        return _process_flowers
     raise ValueError('Dataset {} is not supported'.format(dtst_name))
