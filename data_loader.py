@@ -89,7 +89,7 @@ def _tile_image(dtst_name, num_captions_per_image):
     def tile_image(image, embedding, caption):
         image = tf.expand_dims(image, axis=0)
         image = tf.tile(image, multiples=[num_captions_per_image, 1, 1, 1])
-        return image, embedding, caption[:num_captions_per_image]
+        return image, embedding[:num_captions_per_image], caption[:num_captions_per_image]
 
     return tile_image
 
