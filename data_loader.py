@@ -123,12 +123,13 @@ def _process_dataset(dtst, dtst_name, num_captions_per_image, num_channels, proc
     Returns:
         A processed TF dataset.
     """
-    dtst = dtst.map(_parse(dtst_name), num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    dtst = dtst.map(_tile_image(dtst_name, num_captions_per_image), num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    dtst = dtst.map(_parse(dtst_name), num_parallel_calls=tf.data.experimental.AUTOTUNE, deterministic=False)
+    dtst = dtst.map(_tile_image(dtst_name, num_captions_per_image), num_parallel_calls=tf.data.experimental.AUTOTUNE,
+                    deterministic=False)
     dtst = _unbatch(dtst_name, dtst)
     dtst = dtst.filter(lambda img, embedding, caption: img.shape[-1] == num_channels)
     if process_func is not None:
-        dtst = dtst.map(process_func, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        dtst = dtst.map(process_func, num_parallel_calls=tf.data.experimental.AUTOTUNE, deterministic=False)
     if shuffle:
         dtst = dtst.shuffle(buffer_size=50000)
     return dtst
