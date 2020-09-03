@@ -64,6 +64,36 @@ class GANDiscriminatorLoss:
         return (tf.reduce_mean(real_loss) + tf.reduce_mean(fake_loss)) / 2
 
 
+class VAELoss:
+    """VAE loss.
+
+    Attributes:
+        _binary_cross_entropy:
+    """
+
+    def __init__(self):
+        """Initializes the object."""
+        self._binary_cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=False, reduction='none')
+
+    def __call__(self, x, reconstructed_x, mu, logvar):
+        """Calculates the error.
+
+        Args:
+            x:
+            reconstructed_x:
+            mu:
+            logvar:
+
+        Returns:
+
+        """
+        reconstruction_loss = self._binary_cross_entropy(x, reconstructed_x)
+        reconstruction_loss = tf.reduce_sum(reconstruction_loss, [1, 2, 3])
+        kl_loss = -0.5 * tf.reduce_sum(1 + logvar - tf.square(mu) - tf.exp(logvar), axis=-1)
+        total_loss = reconstruction_loss + kl_loss
+        return tf.reduce_mean(reconstruction_loss), tf.reduce_mean(kl_loss), tf.reduce_mean(total_loss)
+
+
 def get_loss_func(model):
     """Returns loss function(s) according to the model type.
 
@@ -76,5 +106,6 @@ def get_loss_func(model):
     if model == 'gan':
         return {GAN_GEN_LOSS_FUNC: GANGeneratorLoss(),
                 GAN_DISC_LOSS_FUNC: GANDiscriminatorLoss()}
-
+    elif model == 'vae':
+        return VAELoss
     raise ValueError('Model {} is not supported.'.format(model))
