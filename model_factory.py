@@ -1,6 +1,7 @@
 """Returns model according to the configuration."""
 
 from gan import GAN
+from vae import VAE
 
 
 def get_model(model_name, dtst_name, use_condition, batch_size, noise_size, compression_size):
@@ -19,8 +20,8 @@ def get_model(model_name, dtst_name, use_condition, batch_size, noise_size, comp
     """
     if model_name == 'gan':
         return GAN(dtst_name, compression_size, noise_size, batch_size, use_condition)
-    # elif model_name == 'vae':
-    #     return _get_vae_model(dtst_name)
+    elif model_name == 'vae':
+        return VAE(dtst_name, compression_size, noise_size, batch_size, use_condition)
     # elif model_name == 'flow':
     #     return _get_flow_model(dtst_name)
     else:
