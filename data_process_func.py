@@ -48,8 +48,7 @@ def _process_rgb_images_make_sure_3_channels(image, embedding, caption):
     Returns:
 
     """
-    if image.shape[-1] == 1:
-        image = tf.image.grayscale_to_rgb(image)
+    image = tf.tile(image, [1, 1, 3])[:, :, :3]
     image = tf.image.convert_image_dtype(image, tf.float32)
     image = tf.image.resize(image, [64, 64])
     image = (image - 0.5) / 0.5
