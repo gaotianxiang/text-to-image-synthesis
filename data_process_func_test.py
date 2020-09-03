@@ -28,7 +28,7 @@ class DataProcessFuncTest(unittest.TestCase):
         self.drop_remainder = True
 
     def test_mnist_train(self):
-        data_loader = get_data_loader('mnist', MNIST_TRAIN, 10, num_channels=1, process_func=get_process_func('mnist'),
+        data_loader = get_data_loader('mnist', MNIST_TRAIN, 10, process_func=get_process_func('mnist'),
                                       shuffle=True, batch_size=self.batch_size, drop_remainder=self.drop_remainder)
 
         for img, label, _ in data_loader:
@@ -38,7 +38,7 @@ class DataProcessFuncTest(unittest.TestCase):
             self.assertEqual(label.dtype, tf.float32)
 
     def test_mnist_val(self):
-        data_loader = get_data_loader('mnist', MNIST_VAL, 10, num_channels=1, process_func=get_process_func('mnist'),
+        data_loader = get_data_loader('mnist', MNIST_VAL, 10, process_func=get_process_func('mnist'),
                                       shuffle=False, batch_size=self.batch_size, drop_remainder=self.drop_remainder)
 
         for img, label, _ in data_loader:
@@ -48,8 +48,8 @@ class DataProcessFuncTest(unittest.TestCase):
             self.assertEqual(label.dtype, tf.float32)
 
     def test_fmnist_train(self):
-        data_loader = get_data_loader('fmnist', FMNIST_TRAIN, 10, num_channels=1,
-                                      process_func=get_process_func('fmnist'), shuffle=True, batch_size=self.batch_size,
+        data_loader = get_data_loader('fmnist', FMNIST_TRAIN, 10,
+                                      process_func=get_process_func('mnist'), shuffle=True, batch_size=self.batch_size,
                                       drop_remainder=self.drop_remainder)
 
         for img, label, _ in data_loader:
@@ -59,7 +59,7 @@ class DataProcessFuncTest(unittest.TestCase):
             self.assertEqual(label.dtype, tf.float32)
 
     def test_fmnist_val(self):
-        data_loader = get_data_loader('mnist', FMNIST_VAL, 10, num_channels=1, process_func=get_process_func('fmnist'),
+        data_loader = get_data_loader('mnist', FMNIST_VAL, 10, process_func=get_process_func('mnist'),
                                       shuffle=False, batch_size=self.batch_size, drop_remainder=self.drop_remainder)
 
         for img, label, _ in data_loader:
@@ -69,7 +69,7 @@ class DataProcessFuncTest(unittest.TestCase):
             self.assertEqual(label.dtype, tf.float32)
 
     def test_cub_train(self):
-        data_loader = get_data_loader('cub', CUB_TRAIN, 10, num_channels=3, process_func=get_process_func('cub'),
+        data_loader = get_data_loader('cub', CUB_TRAIN, 10, process_func=get_process_func('image_make_sure_3_channels'),
                                       shuffle=True, batch_size=self.batch_size, drop_remainder=self.drop_remainder)
 
         for img, embedding, caption in data_loader:
@@ -81,7 +81,7 @@ class DataProcessFuncTest(unittest.TestCase):
             self.assertEqual(caption.dtype, tf.string)
 
     def test_cub_val(self):
-        data_loader = get_data_loader('cub', CUB_VAL, 10, num_channels=3, process_func=get_process_func('cub'),
+        data_loader = get_data_loader('cub', CUB_VAL, 10, process_func=get_process_func('image_make_sure_3_channels'),
                                       shuffle=False, batch_size=self.batch_size, drop_remainder=self.drop_remainder)
 
         for img, embedding, caption in data_loader:
@@ -93,8 +93,8 @@ class DataProcessFuncTest(unittest.TestCase):
             self.assertEqual(caption.dtype, tf.string)
 
     def test_flower_train(self):
-        data_loader = get_data_loader('flower', FLOWER_TRAIN, 10, num_channels=3,
-                                      process_func=get_process_func('flower'), shuffle=True,
+        data_loader = get_data_loader('flower', FLOWER_TRAIN, 10,
+                                      process_func=get_process_func('image'), shuffle=True,
                                       batch_size=self.batch_size, drop_remainder=self.drop_remainder)
 
         for img, embedding, caption in data_loader:
@@ -106,7 +106,7 @@ class DataProcessFuncTest(unittest.TestCase):
             self.assertEqual(caption.dtype, tf.string)
 
     def test_flower_val(self):
-        data_loader = get_data_loader('flower', FLOWER_VAL, 10, num_channels=3, process_func=get_process_func('flower'),
+        data_loader = get_data_loader('flower', FLOWER_VAL, 10, process_func=get_process_func('image'),
                                       shuffle=False, batch_size=self.batch_size, drop_remainder=self.drop_remainder)
 
         for img, embedding, caption in data_loader:

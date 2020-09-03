@@ -22,7 +22,7 @@ MSCOCO_VAL = '/home/tianxiang/datasets/tfrecords/mscoco/val'
 
 class DataLoaderTest(unittest.TestCase):
     def test_mnist_train(self):
-        dtst = get_data_loader('mnist', MNIST_TRAIN, num_caption_per_image=None, num_channels=1, process_func=None,
+        dtst = get_data_loader('mnist', MNIST_TRAIN, num_caption_per_image=None, process_func=None,
                                shuffle=True, batch_size=32, drop_remainder=True)
 
         for img, l in dtst:
@@ -33,7 +33,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(l.dtype, tf.uint8)
 
     def test_mnist_val(self):
-        dtst = get_data_loader('mnist', MNIST_VAL, num_caption_per_image=None, num_channels=1, process_func=None,
+        dtst = get_data_loader('mnist', MNIST_VAL, num_caption_per_image=None, process_func=None,
                                shuffle=True, batch_size=32, drop_remainder=True)
 
         for img, l in dtst:
@@ -44,7 +44,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(l.dtype, tf.uint8)
 
     def test_fmnist_train(self):
-        dtst = get_data_loader('fmnist', FMNIST_TRAIN, num_caption_per_image=None, num_channels=1, process_func=None,
+        dtst = get_data_loader('fmnist', FMNIST_TRAIN, num_caption_per_image=None, process_func=None,
                                shuffle=True, batch_size=32, drop_remainder=True)
 
         for img, l in dtst:
@@ -55,7 +55,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(l.dtype, tf.uint8)
 
     def test_fmnist_val(self):
-        dtst = get_data_loader('fmnist', FMNIST_VAL, num_caption_per_image=None, num_channels=1, process_func=None,
+        dtst = get_data_loader('fmnist', FMNIST_VAL, num_caption_per_image=None, process_func=None,
                                shuffle=True, batch_size=32, drop_remainder=True)
 
         for img, l in dtst:
@@ -66,7 +66,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(l.dtype, tf.uint8)
 
     def test_cub_train(self):
-        dtst = get_data_loader('cub', CUB_TRAIN, num_caption_per_image=10, num_channels=3, process_func=None,
+        dtst = get_data_loader('cub', CUB_TRAIN, num_caption_per_image=10, process_func=None,
                                shuffle=True, batch_size=None, drop_remainder=True)
 
         for img, embedding, caption in dtst:
@@ -77,7 +77,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(caption.dtype, tf.string)
 
     def test_cub_val(self):
-        dtst = get_data_loader('cub', CUB_VAL, num_caption_per_image=10, num_channels=3, process_func=None,
+        dtst = get_data_loader('cub', CUB_VAL, num_caption_per_image=10, process_func=None,
                                shuffle=True, batch_size=None, drop_remainder=True)
 
         for img, embedding, caption in dtst:
@@ -88,7 +88,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(caption.dtype, tf.string)
 
     def test_flower_train(self):
-        dtst = get_data_loader('flower', FLOWER_TRAIN, num_caption_per_image=10, num_channels=3, process_func=None,
+        dtst = get_data_loader('flower', FLOWER_TRAIN, num_caption_per_image=10, process_func=None,
                                shuffle=True, batch_size=None, drop_remainder=True)
 
         for img, embedding, caption in dtst:
@@ -99,7 +99,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(caption.dtype, tf.string)
 
     def test_flower_val(self):
-        dtst = get_data_loader('flower', FLOWER_VAL, num_caption_per_image=10, num_channels=3, process_func=None,
+        dtst = get_data_loader('flower', FLOWER_VAL, num_caption_per_image=10, process_func=None,
                                shuffle=True, batch_size=None, drop_remainder=True)
 
         for img, embedding, caption in dtst:
@@ -110,7 +110,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(caption.dtype, tf.string)
 
     def test_mscoco_train(self):
-        dtst = get_data_loader('coco', MSCOCO_TRAIN, num_caption_per_image=5, num_channels=3, process_func=None,
+        dtst = get_data_loader('coco', MSCOCO_TRAIN, num_caption_per_image=5, process_func=None,
                                shuffle=True, batch_size=None, drop_remainder=True)
 
         for img, embedding, caption in dtst:
@@ -121,7 +121,7 @@ class DataLoaderTest(unittest.TestCase):
             self.assertEqual(caption.dtype, tf.string)
 
     def test_mscoco_val(self):
-        dtst = get_data_loader('coco', MSCOCO_VAL, num_caption_per_image=5, num_channels=3, process_func=None,
+        dtst = get_data_loader('coco', MSCOCO_VAL, num_caption_per_image=5, process_func=None,
                                shuffle=True, batch_size=None, drop_remainder=True)
 
         for img, embedding, caption in dtst:

@@ -109,14 +109,13 @@ def _unbatch(dtst_name, dtst):
     return dtst.unbatch()
 
 
-def _process_dataset(dtst, dtst_name, num_captions_per_image, num_channels, process_func, shuffle):
+def _process_dataset(dtst, dtst_name, num_captions_per_image, process_func, shuffle):
     """Processes the TFRecord dataset.
 
     Args:
         dtst:
         dtst_name:
         num_captions_per_image:
-        num_channels:
         process_func:
         shuffle:
 
@@ -127,7 +126,6 @@ def _process_dataset(dtst, dtst_name, num_captions_per_image, num_channels, proc
     dtst = dtst.map(_tile_image(dtst_name, num_captions_per_image), num_parallel_calls=tf.data.experimental.AUTOTUNE,
                     deterministic=False)
     dtst = _unbatch(dtst_name, dtst)
-    dtst = dtst.filter(lambda *args: args[0].shape[-1] == num_channels)
     if process_func is not None:
         dtst = dtst.map(process_func, num_parallel_calls=tf.data.experimental.AUTOTUNE, deterministic=False)
     if shuffle:
@@ -151,7 +149,7 @@ def _batchify(dtst, batch_size, drop_remainder):
     return dtst.batch(batch_size, drop_remainder).prefetch(tf.data.experimental.AUTOTUNE)
 
 
-def get_data_loader(dataset_name, tfrecord_dir, num_caption_per_image, num_channels, process_func, shuffle, batch_size,
+def get_data_loader(dataset_name, tfrecord_dir, num_caption_per_image, process_func, shuffle, batch_size,
                     drop_remainder):
     """Gets data loader.
 
@@ -159,7 +157,6 @@ def get_data_loader(dataset_name, tfrecord_dir, num_caption_per_image, num_chann
         dataset_name:
         tfrecord_dir:
         num_caption_per_image:
-        num_channels:
         process_func:
         shuffle:
         batch_size:
@@ -169,6 +166,6 @@ def get_data_loader(dataset_name, tfrecord_dir, num_caption_per_image, num_chann
         A TF dataset.
     """
     dtst = _get_tf_record_dataset(tfrecord_dir)
-    dtst = _process_dataset(dtst, dataset_name, num_caption_per_image, num_channels, process_func, shuffle)
+    dtst = _process_dataset(dtst, dataset_name, num_caption_per_image, process_func, shuffle)
     dtst = _batchify(dtst, batch_size, drop_remainder)
     return dtst

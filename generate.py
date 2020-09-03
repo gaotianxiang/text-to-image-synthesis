@@ -18,7 +18,8 @@ flags.DEFINE_integer('num_caption_per_image', default=5, help='Number of caption
 flags.DEFINE_bool('shuffle', default=False, help='Whether to shuffle the dataset.')
 flags.DEFINE_integer('batch_size', default=64, help='Batch size.')
 flags.DEFINE_bool('drop_remainder', default=True, help='Whether to drop remainder in the data loader.')
-flags.DEFINE_enum('num_channels', default=3, enum_values=[1, 3], help='Number of channels of the dataset images.')
+flags.DEFINE_enum('preprocess', default=None, enum_values=['mnist', 'image', 'image_make_sure_3_channels'],
+                  help='Number of channels of the dataset images.')
 
 flags.DEFINE_enum('model', default=None, enum_values=['gan', 'vae', 'flow'], help='Which type of model will be used.')
 flags.DEFINE_bool('use_condition', default=False, help='Whether to use conditioned generative model.')
@@ -42,8 +43,8 @@ def main(argv):
     del argv
 
     data_loader = get_data_loader(dataset_name=FLAGS.dtst_name, tfrecord_dir=FLAGS.tfrecord_dir,
-                                  num_caption_per_image=FLAGS.num_caption_per_image, num_channels=FLAGS.num_channels,
-                                  process_func=get_process_func(FLAGS.dtst_name), shuffle=FLAGS.shuffle,
+                                  num_caption_per_image=FLAGS.num_caption_per_image,
+                                  process_func=get_process_func(FLAGS.preprocess), shuffle=FLAGS.shuffle,
                                   batch_size=FLAGS.batch_size, drop_remainder=FLAGS.drop_remainder)
     model = get_model(model_name=FLAGS.model, dtst_name=FLAGS.dtst_name, use_condition=FLAGS.use_condition,
                       batch_size=FLAGS.batch_size, noise_size=FLAGS.noise_size, compression_size=FLAGS.compression_size)
@@ -56,4 +57,5 @@ def main(argv):
 
 
 if __name__ == '__main__':
+    flags.mark_flags_as_required(['dtst_name', 'tfrecord_dir', 'preprocess', 'model', 'ckpt_dir', 'output_dir'])
     app.run(main)
