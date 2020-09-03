@@ -33,17 +33,17 @@ class ClassConditionedGenerator(tf.keras.layers.Layer):
         self._model = tf.keras.Sequential([
             tf.keras.layers.Dense(7 * 7 * 256, use_bias=False),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.LeakyReLU(),
+            tf.keras.layers.ReLU(),
 
             tf.keras.layers.Reshape([7, 7, 256]),
 
             tf.keras.layers.Conv2DTranspose(128, [5, 5], padding='same', use_bias=False),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.LeakyReLU(),
+            tf.keras.layers.ReLU(),
 
             tf.keras.layers.Conv2DTranspose(64, [5, 5], strides=2, padding='same', use_bias=False),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.LeakyReLU(),
+            tf.keras.layers.ReLU(),
 
             tf.keras.layers.Conv2DTranspose(1, [5, 5], strides=2, padding='same', use_bias=False, activation='tanh'),
         ])
@@ -234,16 +234,20 @@ class EmbeddingConditionedDiscriminator(tf.keras.layers.Layer):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.LeakyReLU(),
         ])
-        self._final_layer = tf.keras.Sequential([
-            tf.keras.layers.Conv2D(1024, [1, 1], strides=1, padding='same'),
-            tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.LeakyReLU(),
 
-            tf.keras.layers.Conv2D(1, [4, 4], strides=1, padding='valid'),
-            tf.keras.layers.Flatten()
-        ])
         if use_condition:
-            self._compression = tf.keras.layers.Dense(compression_size, use_bias=False)
+            self._intermediate_layer = tf.keras.Sequential([
+                tf.keras.layers.Conv2D(1024, [1, 1], strides=1, padding='same'),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.LeakyReLU(),
+            ])
+            self._compression = tf.keras.layers.Dense(
+                compression_size, use_bias=False)
+
+        self._final_layer = tf.keras.Sequential([
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(1)
+        ])
 
     def call(self, image, embedding):
         """Applies the model to the inputs.
@@ -262,6 +266,7 @@ class EmbeddingConditionedDiscriminator(tf.keras.layers.Layer):
             embedding = tf.expand_dims(embedding, 1)
             embedding = tf.tile(embedding, multiples=[1, 4, 4, 1])
             x = tf.concat([x, embedding], axis=-1)
+            x = self._intermediate_layer(x)
         x = self._final_layer(x)
         return x
 
@@ -325,11 +330,15 @@ class GAN(Model):
         noise = tf.random.normal(shape=[self.batch_size, self.noise_size])
 
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
-            fake_image = self._generator(noise, embedding)
+            fake_image = self._generator(noise, embedding, training=True)
+            
+            real_img_real_caption = self._discriminator(image, embedding, training=True)
+            fake_img_real_caption = self._discriminator(fake_image, embedding, training=True)
 
-            real_img_real_caption = self._discriminator(image, embedding)
-            real_img_fake_caption = self._discriminator(image, embedding[::-1])
-            fake_img_real_caption = self._discriminator(fake_image, embedding)
+            if self.use_condition:
+                real_img_fake_caption = self._discriminator(image, embedding[::-1], training=True)
+            else:
+                real_img_fake_caption = None
 
             gen_loss = generator_loss_func(fake_img_real_caption)
             disc_loss = discriminator_loss_func(real_img_real_caption, real_img_fake_caption, fake_img_real_caption,
@@ -355,12 +364,12 @@ class GAN(Model):
         """
         if not self.use_condition:
             noise = tf.random.normal(shape=[num, self.noise_size])
-            fake_img = self._generator(noise, embedding)
+            fake_img = self._generator(noise, embedding, training=False)
         else:
             num = embedding.shape[0]
             noise = tf.random.normal(shape=[num_per_caption * num, self.noise_size])
             embedding = tf.tile(embedding, multiples=[num_per_caption, 1])
-            fake_img = self._generator(noise, embedding)
+            fake_img = self._generator(noise, embedding, training=False)
         return fake_img
 
     def __str__(self):
