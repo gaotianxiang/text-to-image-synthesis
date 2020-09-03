@@ -68,7 +68,33 @@ def _fake_only_visualize(fake_img, real_img, caption, num, num_per_caption, num_
     return fake_img, grid
 
 
+def _fake_real_visualize(fake_img, real_img, caption, num, num_per_caption, num_per_row, model):
+    """Visualizes the fake and real images.
+
+    Args:
+        fake_img:
+        real_img:
+        caption:
+        num:
+        num_per_caption:
+        num_per_row:
+        model:
+
+    Returns:
+
+    """
+    fake_img = _post_process(fake_img, model)
+    fake_grid = _make_grid(fake_img, cols=num_per_caption)
+    fake_grid = tf.convert_to_tensor(fake_grid, dtype=tf.uint8)
+    real_grid = _make_grid(real_img, cols=1)
+    real_grid = tf.convert_to_tensor(real_grid, dtype=tf.uint8)
+    grid = tf.concat([real_grid, fake_grid], axis=1)
+    return fake_img, grid
+
+
 def get_visualize_tool(mode):
     if mode == 'fake_only':
         return _fake_only_visualize
+    elif mode == 'fake_real':
+        return _fake_real_visualize
     raise ValueError('Visualize model {} is not supported.')
