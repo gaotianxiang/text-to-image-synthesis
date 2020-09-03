@@ -14,10 +14,14 @@ def _post_process(image, model):
     Returns:
 
     """
-    if model in ['gan', 'vae']:
+    if model == 'gan':
         image = tf.clip_by_value(image, -1, 1)
         image = image * 127.5 + 127.5
         image = tf.cast(image, tf.uint8)
+        return image
+    elif model == 'vae':
+        image = tf.clip_by_value(image, 0, 1)
+        image = tf.image.convert_image_dtype(image, tf.uint8)
         return image
     raise ValueError('Model {} is not supported.'.format(model))
 
