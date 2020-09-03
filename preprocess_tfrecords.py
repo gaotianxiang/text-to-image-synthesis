@@ -1,6 +1,7 @@
 """Preprocesses and stores datasets in TFRecord format."""
 
-import argparse
+from absl import app
+from absl import flags
 import glob
 import os
 import pickle
@@ -8,28 +9,23 @@ import pickle
 import ray
 import tensorflow as tf
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', type=str, help='Dataset.', choices=['mnist', 'fmnist', 'cub', 'flowers', 'mscoco'],
-                    required=True)
-parser.add_argument('--split', type=str, default='train',
-                    help='Which split to pick. Either \'train\' or \'val\'. Only valid for dataset mnist and fmnist.',
-                    choices=['train', 'val'])
-parser.add_argument('--output_dir', type=str, help='Directory to which the records will be stored.', required=True)
-parser.add_argument('--embedding_dir', type=str,
-                    help='Directory to which the embeddings are stored. '
-                         'Required if the dataset is either cub, flowers, or mscoco.')
-parser.add_argument('--caption_dir', type=str, help='Directory to which the captions are stored.', required=True)
-parser.add_argument('--img_dir', type=str, help='Directory to which the images are stored. '
+FLAGS = flags.FLAGS
+flags.DEFINE_enum('dataset', None, enum_values=['mnist', 'fmnist', 'cub', 'flowers', 'mscoco'], help='Dataset.')
+flags.DEFINE_enum('split', None, enum_values=['train', 'val'],
+                  help='Which split to pick. Either \'train\' or \'val\'. Only valid for dataset mnist and fmnist.')
+flags.DEFINE_string('output_dir', None, help='Directory to which the records will be stored.')
+flags.DEFINE_string('embedding_dir', None, help='Directory to which the embeddings are stored. '
                                                 'Required if the dataset is either cub, flowers, or mscoco.')
-parser.add_argument('--num_shards', type=int, help='Number of TFRecords files that will be generated for the dataset.')
-
-args = parser.parse_args()
+flags.DEFINE_string('caption_dir', None, help='Directory to which the captions are stored.')
+flags.DEFINE_string('img_dir', None, help='Directory to which the images are stored. '
+                                          'Required if the dataset is either cub, flowers, or mscoco.')
+flags.DEFINE_integer('num_shards', None, help='Number of TFRecord files that will be generated for the dataset.')
 
 
 def chunkify(original_list, num_shards):
     """Cut the original list into several chunks for parallel processing.
 
-    Args:
+    FLAGS:
         original_list: The original list.
         num_shards: Number of chunks.
 
@@ -49,7 +45,7 @@ def chunkify(original_list, num_shards):
 def _bytes_feature(value):
     """Converts values into TF compatible bytes feature.
 
-    Args:
+    FLAGS:
         value: An input value.
 
     Returns:
@@ -64,7 +60,7 @@ def _bytes_feature(value):
 def read_pickle(path_to_pickle):
     """Reads a pickle file.
 
-    Args:
+    FLAGS:
         path_to_pickle:
     """
     with open(path_to_pickle, 'rb') as f:
@@ -75,7 +71,7 @@ def read_pickle(path_to_pickle):
 def read_txt(path_to_txt):
     """Reads a txt file.
 
-    Args:
+    FLAGS:
         path_to_txt:
 
     Returns:
@@ -89,7 +85,7 @@ def read_txt(path_to_txt):
 def read_captions(caption_dir):
     """Read captions.
 
-    Args:
+    FLAGS:
         caption_dir:
 
     Returns:
@@ -104,7 +100,7 @@ def read_captions(caption_dir):
 def read_img(path_to_img):
     """Reads a image with tensorflow.
 
-    Args:
+    FLAGS:
         path_to_img:
 
     Returns:
@@ -135,7 +131,7 @@ class ClassConditionedDataset(TFRecordDataset):
     def __init__(self, output_dir, split='train', num_shards=8):
         """Initializes the object.
 
-        Args:
+        FLAGS:
             output_dir:
             split:
             num_shards:
@@ -156,7 +152,7 @@ class ClassConditionedDataset(TFRecordDataset):
     def _get_tfexample(self, index, imgs, labels):
         """Gets a TFExample.
 
-        Args:
+        FLAGS:
             index: An index.
             imgs: Image array.
             labels: label array.
@@ -176,7 +172,7 @@ class ClassConditionedDataset(TFRecordDataset):
     def _build_single_tfrecord(self, chunk, imgs, labels, path_to_record):
         """Builds a single TFRecord.
 
-        Args:
+        FLAGS:
             chunk: List of indices that will be processed and written in this TFRecord file.
             imgs; Image array.
             labels: Label array.
@@ -196,7 +192,7 @@ class ClassConditionedDataset(TFRecordDataset):
     def _get_features(self, indices_chunks, imgs, labels):
         """Creates sub-tasks.
 
-        Args:
+        FLAGS:
             indices_chunks: List of indices chunks.
             imgs: Image array.
             labels: Label array.
@@ -271,7 +267,7 @@ class EmbeddingConditionedDataset(TFRecordDataset):
     def __init__(self, embedding_dir, img_dir, caption_dir, output_dir, num_shards):
         """Initializes the object.
 
-        Args:
+        FLAGS:
             embedding_dir: Directory to which the embeddings are stored.
             img_dir: Directory to which the images are stored.
             caption_dir: Directory to which the captions are stored.
@@ -298,7 +294,7 @@ class EmbeddingConditionedDataset(TFRecordDataset):
     def _get_tfexample(self, img, embedding, caption):
         """Gets a TFExample.
 
-        Args:
+        FLAGS:
             img: tf.uint8
             embedding:
             caption:
@@ -317,7 +313,7 @@ class EmbeddingConditionedDataset(TFRecordDataset):
     def _tf_read_img(self, filename):
         """Reads a image.
 
-        Args:
+        FLAGS:
             filename:
 
         Returns:
@@ -328,7 +324,7 @@ class EmbeddingConditionedDataset(TFRecordDataset):
     def _read_captions(self, filename, captions):
         """Return captions related to the specific filename.
 
-        Args:
+        FLAGS:
             filename:
             captions:
         """
@@ -338,7 +334,7 @@ class EmbeddingConditionedDataset(TFRecordDataset):
     def _build_single_tfrecord(self, chunk, filenames, embeddings, captions, path_to_record):
         """Builds a single TFRecord.
 
-        Args:
+        FLAGS:
             chunk:
             filenames:
             embeddings:
@@ -361,7 +357,7 @@ class EmbeddingConditionedDataset(TFRecordDataset):
     def _get_features(self, indices_chunk, filenames, embeddings, captions):
         """Creates sub-tasks
 
-        Args:
+        FLAGS:
             indices_chunk:
             filenames:
             embeddings:
@@ -439,28 +435,30 @@ class MSCOCOTFRecord(EmbeddingConditionedDataset):
 
 
 def get_dtst():
-    if args.dataset == 'mnist':
-        dtst = MNISTTFRecord(output_dir=args.output_dir, split=args.split, num_shards=args.num_shards)
-    elif args.dataset == 'fmnist':
-        dtst = FMNISTTFRecord(output_dir=args.output_dir, split=args.split, num_shards=args.num_shards)
-    elif args.dataset == 'cub':
-        dtst = CUBTFRecord(embedding_dir=args.embedding_dir, img_dir=args.img_dir, caption_dir=args.caption_dir,
-                           output_dir=args.output_dir, num_shards=args.num_shards)
-    elif args.dataset == 'flowers':
-        dtst = FlowersTFRecord(embedding_dir=args.embedding_dir, img_dir=args.img_dir, caption_dir=args.caption_dir,
-                               output_dir=args.output_dir, num_shards=args.num_shards)
-    elif args.dataset == 'mscoco':
-        dtst = MSCOCOTFRecord(embedding_dir=args.embedding_dir, img_dir=args.img_dir, caption_dir=args.caption_dir,
-                              output_dir=args.output_dir, num_shards=args.num_shards)
+    if FLAGS.dataset == 'mnist':
+        dtst = MNISTTFRecord(output_dir=FLAGS.output_dir, split=FLAGS.split, num_shards=FLAGS.num_shards)
+    elif FLAGS.dataset == 'fmnist':
+        dtst = FMNISTTFRecord(output_dir=FLAGS.output_dir, split=FLAGS.split, num_shards=FLAGS.num_shards)
+    elif FLAGS.dataset == 'cub':
+        dtst = CUBTFRecord(embedding_dir=FLAGS.embedding_dir, img_dir=FLAGS.img_dir, caption_dir=FLAGS.caption_dir,
+                           output_dir=FLAGS.output_dir, num_shards=FLAGS.num_shards)
+    elif FLAGS.dataset == 'flowers':
+        dtst = FlowersTFRecord(embedding_dir=FLAGS.embedding_dir, img_dir=FLAGS.img_dir, caption_dir=FLAGS.caption_dir,
+                               output_dir=FLAGS.output_dir, num_shards=FLAGS.num_shards)
+    elif FLAGS.dataset == 'mscoco':
+        dtst = MSCOCOTFRecord(embedding_dir=FLAGS.embedding_dir, img_dir=FLAGS.img_dir, caption_dir=FLAGS.caption_dir,
+                              output_dir=FLAGS.output_dir, num_shards=FLAGS.num_shards)
     else:
-        raise ValueError('Dataset {} is not supported.'.format(args.dataset))
+        raise ValueError('Dataset {} is not supported.'.format(FLAGS.dataset))
     return dtst
 
 
-def main():
+def main(argv):
+    del argv
+
     dtst = get_dtst()
     dtst.build_tfrecord()
 
 
 if __name__ == '__main__':
-    main()
+    app.run(main)
