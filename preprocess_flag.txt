@@ -1,0 +1,7 @@
+--caption_dir=/home/tianxiang/datasets/cub/birds/text_c10/
+--dataset=cub
+--embedding_dir=/home/tianxiang/datasets/cub/birds/test/
+--img_dir=/home/tianxiang/datasets/cub/images/
+--num_shards=4
+--output_dir=/home/tianxiang/datasets/tfrecords/cub2/val/
+--split=train
