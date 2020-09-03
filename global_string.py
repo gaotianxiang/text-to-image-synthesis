@@ -8,3 +8,7 @@ GAN_DISC_OPTIM = 'gan_disc_optimizer'
 
 GAN_GEN_LOSS_FUNC = 'gan_gen_loss_func'
 GAN_DISC_LOSS_FUNC = 'gan_disc_loss_func'
+
+VAE_RECONSTRUCTION_LOSS = 'vae_recon_loss'
+VAE_KL_LOSS = 'vae_kl_loss'
+VAE_TOTAL_LOSS = 'vae_total_loss'
