@@ -84,11 +84,12 @@ def _fake_real_visualize(fake_img, real_img, caption, num, num_per_caption, num_
 
     """
     fake_img = _post_process(fake_img, model)
-    fake_grid = _make_grid(fake_img, cols=num_per_caption)
+    real_img = _post_process(real_img, model)
+    fake_grid = _make_grid(fake_img, cols=num_per_row)
     fake_grid = tf.convert_to_tensor(fake_grid, dtype=tf.uint8)
-    real_grid = _make_grid(real_img, cols=1)
+    real_grid = _make_grid(real_img, cols=num_per_row)
     real_grid = tf.convert_to_tensor(real_grid, dtype=tf.uint8)
-    grid = tf.concat([real_grid, fake_grid], axis=1)
+    grid = tf.concat([real_grid, tf.ones([1] + fake_grid.shape[1:], dtype=tf.uint8) * 255, fake_grid], axis=0)
     return fake_img, grid
 
 
