@@ -99,5 +99,5 @@ def get_loss_func(model):
         return {GAN_GEN_LOSS_FUNC: GANGeneratorLoss(),
                 GAN_DISC_LOSS_FUNC: GANDiscriminatorLoss()}
     elif model == 'vae':
-        return VAELoss
+        return VAELoss()
     raise ValueError('Model {} is not supported.'.format(model))
