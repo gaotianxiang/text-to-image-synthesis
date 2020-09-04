@@ -178,7 +178,7 @@ class ClassConditionedDecoder(tf.keras.layers.Layer):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.ReLU(),
 
-            tf.keras.layers.Conv2DTranspose(1, [5, 5], strides=2, padding='same', use_bias=False, activation='sigmoid'),
+            tf.keras.layers.Conv2DTranspose(1, [5, 5], strides=2, padding='same', use_bias=False, activation='tanh'),
         ])
 
     def call(self, noise, embedding):
@@ -235,7 +235,7 @@ class EmbeddingConditionedDecoder(tf.keras.layers.Layer):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.ReLU(),
 
-            tf.keras.layers.Conv2DTranspose(3, [5, 5], strides=2, padding='same', use_bias=False, activation='sigmoid')
+            tf.keras.layers.Conv2DTranspose(3, [5, 5], strides=2, padding='same', use_bias=False, activation='tanh')
         ])
 
         if use_condition:
