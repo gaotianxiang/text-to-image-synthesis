@@ -65,15 +65,7 @@ class GANDiscriminatorLoss:
 
 
 class VAELoss:
-    """VAE loss.
-
-    Attributes:
-        _binary_cross_entropy:
-    """
-
-    def __init__(self):
-        """Initializes the object."""
-        self._binary_cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=False, reduction='none')
+    """VAE loss."""
 
     def __call__(self, x, reconstructed_x, mu, logvar):
         """Calculates the error.
@@ -87,7 +79,7 @@ class VAELoss:
         Returns:
 
         """
-        reconstruction_loss = self._binary_cross_entropy(x, reconstructed_x)
+        reconstruction_loss = tf.math.squared_difference(x, reconstructed_x)
         reconstruction_loss = tf.reduce_sum(reconstruction_loss, [1, 2, 3])
         kl_loss = -0.5 * tf.reduce_sum(1 + logvar - tf.square(mu) - tf.exp(logvar), axis=-1)
         total_loss = reconstruction_loss + kl_loss
