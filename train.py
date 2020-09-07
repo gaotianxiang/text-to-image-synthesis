@@ -18,10 +18,11 @@ flags.DEFINE_enum('dtst_name', default=None, enum_values=['mnist', 'fmnist', 'cu
                   help='Name of the dataset that will be used to train the model.')
 flags.DEFINE_string('tfrecord_dir', default=None, help='Directory to which the dataset is stored.')
 flags.DEFINE_integer('num_caption_per_image', default=5, help='Number of captions per image.')
-flags.DEFINE_bool('shuffle', default=True, help='Whether to shuffle the dataset.')
+flags.DEFINE_integer('shuffle', default=0, help='Dataset shuffle buffer size. Zero means no shuffle.')
 flags.DEFINE_integer('batch_size', default=64, help='Batch size.')
 flags.DEFINE_bool('drop_remainder', default=True, help='Whether to drop remainder in the data loader.')
-flags.DEFINE_enum('preprocess', default=None, enum_values=['mnist', 'image', 'image_make_sure_3_channels'],
+flags.DEFINE_enum('preprocess', default=None,
+                  enum_values=['mnist', 'image', 'image_make_sure_3_channels'],
                   help='Number of channels of the dataset images.')
 
 flags.DEFINE_enum('model', default=None, enum_values=['gan', 'vae', 'flow'], help='Which type of model will be used.')

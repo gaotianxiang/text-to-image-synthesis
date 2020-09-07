@@ -14,7 +14,7 @@ def _post_process(image, model):
     Returns:
 
     """
-    if model in ['gan', 'vae']:
+    if model == 'gan' or model == 'vae':
         image = tf.clip_by_value(image, -1, 1)
         image = image * 127.5 + 127.5
         image = tf.cast(image, tf.uint8)

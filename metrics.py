@@ -4,6 +4,9 @@ import tensorflow as tf
 
 from global_string import GAN_DISC_LOSS
 from global_string import GAN_GEN_LOSS
+from global_string import VAE_KL_LOSS
+from global_string import VAE_RECONSTRUCTION_LOSS
+from global_string import VAE_TOTAL_LOSS
 
 
 class Metrics:
@@ -65,4 +68,7 @@ def get_metrics(model):
     """
     if model == 'gan':
         return Metrics({GAN_GEN_LOSS: tf.keras.metrics.Mean(), GAN_DISC_LOSS: tf.keras.metrics.Mean()})
+    elif model == 'vae':
+        return Metrics({VAE_RECONSTRUCTION_LOSS: tf.keras.metrics.Mean(), VAE_KL_LOSS: tf.keras.metrics.Mean(),
+                        VAE_TOTAL_LOSS: tf.keras.metrics.Mean()})
     raise ValueError('Model {} is not supported.'.format(model))

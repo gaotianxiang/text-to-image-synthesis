@@ -1,0 +1,14 @@
+--ckpt_dir=/home/tianxiang/exp_artifacts/thesis/vae/conditional/cub/ckpts/
+--dtst_name=cub
+--model=vae
+--num=100
+--num_per_row=10
+--output_dir=/home/tianxiang/exp_artifacts/thesis/vae/conditional/cub/sampling/
+--tfrecord_dir=/home/tianxiang/datasets/tfrecords/cub/train/
+--use_condition
+--visualize_tool=fake_real
+--num_caption_per_image=10
+--preprocess=image_make_sure_3_channels
+--num_per_caption=10
+--batch_size=10
+--shuffle
