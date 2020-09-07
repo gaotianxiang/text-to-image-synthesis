@@ -19,7 +19,7 @@ flags.DEFINE_bool('shuffle', default=False, help='Whether to shuffle the dataset
 flags.DEFINE_integer('batch_size', default=64, help='Batch size.')
 flags.DEFINE_bool('drop_remainder', default=True, help='Whether to drop remainder in the data loader.')
 flags.DEFINE_enum('preprocess', default=None,
-                  enum_values=['mnist', 'image', 'image_make_sure_3_channels', 'vae_mnist', 'vae_image', 'vae_image_3'],
+                  enum_values=['mnist', 'image', 'image_make_sure_3_channels'],
                   help='Number of channels of the dataset images.')
 
 flags.DEFINE_enum('model', default=None, enum_values=['gan', 'vae', 'flow'], help='Which type of model will be used.')
