@@ -128,8 +128,8 @@ def _process_dataset(dtst, dtst_name, num_captions_per_image, process_func, shuf
     dtst = _unbatch(dtst_name, dtst)
     if process_func is not None:
         dtst = dtst.map(process_func, num_parallel_calls=tf.data.experimental.AUTOTUNE, deterministic=False)
-    if shuffle:
-        dtst = dtst.shuffle(buffer_size=50000)
+    if shuffle != 0:
+        dtst = dtst.shuffle(buffer_size=shuffle)
     return dtst
 
 
