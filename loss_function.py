@@ -107,8 +107,8 @@ class FlowLoss:
         log_det = tf.reduce_sum(log_det, axis=[1, 2, 3])
         log_det = tf.reduce_mean(log_det)
         total_loss = -(log_prob + log_det)
-        bpd = total_loss / (h * w * d * tf.math.log(2))
-        return log_prob, log_det, total_loss, bpd
+        bpd = total_loss / (h * w * d * tf.math.log(2.0))
+        return -log_prob, -log_det, total_loss, bpd
 
 
 def get_loss_func(model):
