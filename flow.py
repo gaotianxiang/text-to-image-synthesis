@@ -63,8 +63,8 @@ class BatchNorm(tf.keras.layers.Layer):
             if training:
                 batch_mean = tf.math.reduce_mean(image, axis=0)
                 batch_var = tf.math.reduce_variance(image, axis=0)
-                self.running_mean = self.running_mean * self._momentum + (1 - self._momentum) * batch_mean
-                self.running_var = self.running_var * self._momentum + (1 - self._momentum) * batch_var
+                self.running_mean.assign(self.running_mean * self._momentum + (1 - self._momentum) * batch_mean)
+                self.running_var.assign(self.running_var * self._momentum + (1 - self._momentum) * batch_var)
             else:
                 batch_mean = self.running_mean
                 batch_var = self.running_var
