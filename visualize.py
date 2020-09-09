@@ -19,6 +19,11 @@ def _post_process(image, model):
         image = image * 127.5 + 127.5
         image = tf.cast(image, tf.uint8)
         return image
+    elif model == 'flow':
+        image = tf.sigmoid(image)
+        image = image * 255
+        image = tf.cast(image, tf.uint8)
+        return image
     raise ValueError('Model {} is not supported.'.format(model))
 
 
