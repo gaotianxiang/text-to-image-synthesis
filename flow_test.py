@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+from flow import BatchNorm
 from flow import ClassConditionedConvAffineCouplingLayer
 from flow import ClassConditionedFlow
 from flow import EmbeddingConditionedConvAffineCouplingLayer
@@ -98,8 +99,8 @@ class FlowTest(tf.test.TestCase):
         embedding = tf.random.normal([self.batch_size, 10])
 
         model = ClassConditionedFlow(use_condition=False)
-        res_forward, logdet_forward = model(image, embedding, reverse=False)
-        res_backward, logdet_backward = model(res_forward, embedding, reverse=True)
+        res_forward, logdet_forward = model(image, embedding, reverse=False, training=False)
+        res_backward, logdet_backward = model(res_forward, embedding, reverse=True, training=False)
         self.assertAllClose(res_backward, image)
         self.assertAllClose(logdet_forward, -logdet_backward)
 
@@ -133,6 +134,16 @@ class FlowTest(tf.test.TestCase):
         res_backward, logdet_backward = model(res_forward, embedding, reverse=True)
         self.assertAllCloseAccordingToType(logdet_forward, -logdet_backward)
         self.assertAllClose(res_backward, image)
+
+    def test_batch_normalization(self):
+        image = tf.random.normal([self.batch_size, 64, 64, 3])
+        embedding = tf.random.normal([self.batch_size, 1024])
+
+        bn = BatchNorm()
+        res_forward, logdet_forward = bn(image, embedding, reverse=False, training=False)
+        res_backward, logdet_backward = bn(res_forward, embedding, reverse=True, training=False)
+        self.assertAllClose(image, res_backward)
+        self.assertAllClose(logdet_forward, -logdet_backward)
 
 
 if __name__ == '__main__':

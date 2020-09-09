@@ -9,6 +9,78 @@ from global_string import FLOW_TOTAL_LOSS
 from model_interface import Model
 
 
+class BatchNorm(tf.keras.layers.Layer):
+    """Revertible batch normalization.
+
+    Attributes:
+        _momentum:
+        _eps:
+    """
+
+    def __init__(self, momentum=0.9, eps=1e-5):
+        """Initializes the object.
+
+        Args:
+            momentum:
+            eps:
+        """
+        super().__init__()
+        self._momentum = momentum
+        self._eps = eps
+
+    def build(self, input_shape):
+        """Adds variables to the layer.
+
+        Args:
+            input_shape:
+
+        Returns:
+
+        """
+        self.running_mean = self.add_weight(shape=input_shape[1:], dtype=tf.float32,
+                                            initializer=tf.keras.initializers.Zeros(), trainable=False)
+        self.running_var = self.add_weight(shape=input_shape[1:], dtype=tf.float32,
+                                           initializer=tf.keras.initializers.Zeros(), trainable=False)
+        self.log_gamma = self.add_weight(shape=input_shape[1:], dtype=tf.float32,
+                                         initializer=tf.keras.initializers.Zeros(), trainable=True)
+        self.beta = self.add_weight(shape=input_shape[1:], dtype=tf.float32,
+                                    initializer=tf.keras.initializers.Zeros(), trainable=True)
+        super().build(input_shape)
+
+    def call(self, image, embedding, reverse=False, training=True):
+        """Applies the batch normalization to the inputs.
+
+        Args:
+            image:
+            embedding:
+            reverse:
+            training:
+
+        Returns:
+
+        """
+        if not reverse:
+            if training:
+                batch_mean = tf.math.reduce_mean(image, axis=0)
+                batch_var = tf.math.reduce_variance(image, axis=0)
+                self.running_mean = self.running_mean * self._momentum + (1 - self._momentum) * batch_mean
+                self.running_var = self.running_var * self._momentum + (1 - self._momentum) * batch_var
+            else:
+                batch_mean = self.running_mean
+                batch_var = self.running_var
+            image_hat = (image - batch_mean) / tf.math.sqrt(batch_var + self._eps)
+            image_hat = tf.math.exp(self.log_gamma) * image_hat + self.beta
+            log_det = self.log_gamma - 0.5 * tf.math.log(batch_var + self._eps)
+            return image_hat, log_det
+        else:
+            batch_mean = self.running_mean
+            batch_var = self.running_var
+            image_hat = (image - self.beta) / tf.math.exp(self.log_gamma)
+            image_hat = image_hat * tf.math.sqrt(batch_var + self._eps) + batch_mean
+            log_det = -self.log_gamma + 0.5 * tf.math.log(batch_var + self._eps)
+            return image_hat, log_det
+
+
 class ClassConditionedConvAffineCouplingLayer(tf.keras.layers.Layer):
     """Class conditioned convolutional affine coupling layer.
 
@@ -36,7 +108,8 @@ class ClassConditionedConvAffineCouplingLayer(tf.keras.layers.Layer):
             [tf.keras.layers.Conv2D(num, kernel_size=[5, 5], padding='same', activation='relu', use_bias=False),
              tf.keras.layers.BatchNormalization()]
         ])
-        self._log_scale = tf.keras.layers.Conv2D(1, kernel_size=[5, 5], padding='same', use_bias=False, activation='tanh')
+        self._log_scale = tf.keras.layers.Conv2D(1, kernel_size=[5, 5], padding='same', use_bias=False,
+                                                 activation='tanh')
         self._shift = tf.keras.layers.Conv2D(1, kernel_size=[5, 5], padding='same', use_bias=False)
 
     def call(self, image, embedding, reverse=False):
@@ -106,6 +179,7 @@ class ClassConditionedFlow(tf.keras.layers.Layer):
 
         for _ in range(num_layers):
             layers.append(ClassConditionedConvAffineCouplingLayer(num_channels_hidden, mask, self._use_condition))
+            layers.append(BatchNorm())
             mask = 1 - mask
         return layers
 
