@@ -1,5 +1,6 @@
 """Loss functions for different types of model."""
 
+import numpy as np
 import tensorflow as tf
 
 from global_string import GAN_DISC_LOSS_FUNC
@@ -86,6 +87,30 @@ class VAELoss:
         return tf.reduce_mean(reconstruction_loss), tf.reduce_mean(kl_loss), tf.reduce_mean(total_loss)
 
 
+class FlowLoss:
+    """Flow loss."""
+
+    def __call__(self, res, log_det):
+        """Calculates the loss value.
+
+        Args:
+            res:
+            log_det:
+
+        Returns:
+
+        """
+        _, h, w, d = res.get_shape()
+        log_prob = -0.5 * (tf.square(res)) + tf.math.log(2 * np.pi)
+        log_prob = tf.reduce_sum(log_prob, axis=[1, 2, 3])
+        log_prob = tf.reduce_mean(log_prob)
+        log_det = tf.reduce_sum(log_det, axis=[1, 2, 3])
+        log_det = tf.reduce_mean(log_det)
+        total_loss = -(log_prob + log_det)
+        bpd = total_loss / (h * w * d * tf.math.log(2))
+        return log_prob, log_det, total_loss, bpd
+
+
 def get_loss_func(model):
     """Returns loss function(s) according to the model type.
 
@@ -100,4 +125,6 @@ def get_loss_func(model):
                 GAN_DISC_LOSS_FUNC: GANDiscriminatorLoss()}
     elif model == 'vae':
         return VAELoss()
+    elif model == 'flow':
+        return FlowLoss()
     raise ValueError('Model {} is not supported.'.format(model))
