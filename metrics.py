@@ -4,6 +4,10 @@ import tensorflow as tf
 
 from global_string import GAN_DISC_LOSS
 from global_string import GAN_GEN_LOSS
+from global_string import FLOW_BPD
+from global_string import FLOW_LOG_DET
+from global_string import FLOW_LOG_PROB
+from global_string import FLOW_TOTAL_LOSS
 from global_string import VAE_KL_LOSS
 from global_string import VAE_RECONSTRUCTION_LOSS
 from global_string import VAE_TOTAL_LOSS
@@ -71,4 +75,7 @@ def get_metrics(model):
     elif model == 'vae':
         return Metrics({VAE_RECONSTRUCTION_LOSS: tf.keras.metrics.Mean(), VAE_KL_LOSS: tf.keras.metrics.Mean(),
                         VAE_TOTAL_LOSS: tf.keras.metrics.Mean()})
+    elif model == 'flow':
+        return Metrics({FLOW_LOG_DET: tf.keras.metrics.Mean(), FLOW_LOG_PROB: tf.keras.metrics.Mean(),
+                        FLOW_TOTAL_LOSS: tf.keras.metrics.Mean(), FLOW_BPD: tf.keras.metrics.Mean()})
     raise ValueError('Model {} is not supported.'.format(model))
