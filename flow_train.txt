@@ -1,0 +1,12 @@
+--ckpt_dir=/home/tianxiang/exp_artifacts/thesis/flow/non_conditional/mnist/ckpts/
+--dtst_name=mnist
+--lr=1e-4
+--model=flow
+--summary_dir=/home/tianxiang/exp_artifacts/thesis/flow/non_conditional/mnist/summary/
+--tfrecord_dir=/home/tianxiang/datasets/tfrecords/mnist/train/
+--batch_size=64
+--num_epoch=100
+--num_caption_per_image=10
+--preprocess=mnist_flow
+--nouse_condition
+--shuffle=20000
