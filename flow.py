@@ -36,7 +36,7 @@ class ClassConditionedConvAffineCouplingLayer(tf.keras.layers.Layer):
             [tf.keras.layers.Conv2D(num, kernel_size=[5, 5], padding='same', activation='relu', use_bias=False),
              tf.keras.layers.BatchNormalization()]
         ])
-        self._log_scale = tf.keras.layers.Conv2D(1, kernel_size=[5, 5], padding='same', use_bias=False)
+        self._log_scale = tf.keras.layers.Conv2D(1, kernel_size=[5, 5], padding='same', use_bias=False, activation='tanh')
         self._shift = tf.keras.layers.Conv2D(1, kernel_size=[5, 5], padding='same', use_bias=False)
 
     def call(self, image, embedding, reverse=False):
@@ -87,7 +87,7 @@ class ClassConditionedFlow(tf.keras.layers.Layer):
         """
         super().__init__()
         self._use_condition = use_condition
-        self._model = self._get_coupling_layers(num_layers=4, num_channels_hidden=[32, 32])
+        self._model = self._get_coupling_layers(num_layers=5, num_channels_hidden=[64, 64])
 
     def _get_coupling_layers(self, num_layers, num_channels_hidden):
         """Returns a list of convolutional affine coupling layers.
@@ -321,11 +321,11 @@ class Flow(Model):
         image, embedding, _ = inputs
 
         with tf.GradientTape() as tape:
-            res, logdet = self._flow(image, embedding, reserve=False, training=True)
+            res, logdet = self._flow(image, embedding, reverse=False, training=True)
             log_likelihood, logdet, total_loss, bpd = loss_function(res, logdet)
 
-        grads = tape.gradient(total_loss, self._flow.trainable_varables)
-        optimizer.apply_gradients(zip(grads, self._flow.trainable_varables))
+        grads = tape.gradient(total_loss, self._flow.trainable_variables)
+        optimizer.apply_gradients(zip(grads, self._flow.trainable_variables))
 
         return {FLOW_LOG_PROB: log_likelihood, FLOW_LOG_DET: logdet, FLOW_TOTAL_LOSS: total_loss, FLOW_BPD: bpd}
 
@@ -342,7 +342,7 @@ class Flow(Model):
         """
         if not self.use_condition:
             noise = self._get_noise(num)
-            fake_img = self._flow(noise, embedding, reverse=True, training=False)
+            fake_img, _ = self._flow(noise, embedding, reverse=True, training=False)
         else:
             num = embedding.shape[0]
             noise = self._get_noise(num_per_caption * num)
