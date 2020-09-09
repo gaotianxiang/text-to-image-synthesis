@@ -12,3 +12,8 @@ GAN_DISC_LOSS_FUNC = 'gan_disc_loss_func'
 VAE_RECONSTRUCTION_LOSS = 'vae_recon_loss'
 VAE_KL_LOSS = 'vae_kl_loss'
 VAE_TOTAL_LOSS = 'vae_total_loss'
+
+FLOW_LOG_PROB = 'flow_log_prob'
+FLOW_LOG_DET = 'flow_log_det'
+FLOW_TOTAL_LOSS = 'flow_total_loss'
+FLOW_BPD = 'flow_bpd'
