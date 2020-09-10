@@ -37,13 +37,13 @@ class BatchNorm(tf.keras.layers.Layer):
         Returns:
 
         """
-        self.running_mean = self.add_weight(shape=input_shape[1:], dtype=tf.float32,
+        self.running_mean = self.add_weight(name='running_mean', shape=input_shape[1:], dtype=tf.float32,
                                             initializer=tf.keras.initializers.Zeros(), trainable=False)
-        self.running_var = self.add_weight(shape=input_shape[1:], dtype=tf.float32,
+        self.running_var = self.add_weight(name='running_var', shape=input_shape[1:], dtype=tf.float32,
                                            initializer=tf.keras.initializers.Zeros(), trainable=False)
-        self.log_gamma = self.add_weight(shape=input_shape[1:], dtype=tf.float32,
+        self.log_gamma = self.add_weight(name='log_gamma', shape=input_shape[1:], dtype=tf.float32,
                                          initializer=tf.keras.initializers.Zeros(), trainable=True)
-        self.beta = self.add_weight(shape=input_shape[1:], dtype=tf.float32,
+        self.beta = self.add_weight(name='beta', shape=input_shape[1:], dtype=tf.float32,
                                     initializer=tf.keras.initializers.Zeros(), trainable=True)
         super().build(input_shape)
 
@@ -160,7 +160,7 @@ class ClassConditionedFlow(tf.keras.layers.Layer):
         """
         super().__init__()
         self._use_condition = use_condition
-        self._model = self._get_coupling_layers(num_layers=5, num_channels_hidden=[64, 64])
+        self._model = self._get_coupling_layers(num_layers=8, num_channels_hidden=[64, 64, 64])
 
     def _get_coupling_layers(self, num_layers, num_channels_hidden):
         """Returns a list of convolutional affine coupling layers.
@@ -421,7 +421,7 @@ class Flow(Model):
             num = embedding.shape[0]
             noise = self._get_noise(num_per_caption * num)
             embedding = tf.tile(embedding, multiples=[num_per_caption, 1])
-            fake_img = self._flow(noise, embedding, reverse=True, training=False)
+            fake_img, _ = self._flow(noise, embedding, reverse=True, training=False)
         return fake_img
 
     def __str__(self):
