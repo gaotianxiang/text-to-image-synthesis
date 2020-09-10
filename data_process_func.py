@@ -31,8 +31,8 @@ def _process_flow_mnist(image, label):
 
     """
     image = tf.cast(image, tf.float32)
-    image = (image + tf.random.uniform([28, 28])) / 256
-    image = tf.expand_dims(image, axis=-1)
+    image = tf.reshape(image, shape=[-1])
+    image = (image + tf.random.uniform([784])) / 256
     label = tf.one_hot(label, 10)
     image = ((image * 2 - 1) * 0.9 + 1) / 2
     image = tf.math.log(image) - tf.math.log(1 - image)
