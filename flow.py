@@ -375,7 +375,7 @@ class Flow(Model):
 
     def _get_noise(self, num):
         if self.dtst_name in ['mnist', 'fmnist']:
-            return tf.random.normal(shape=[num, 28, 28, 1])
+            return tf.random.normal(shape=[num, 784])
         return tf.random.normal(shape=[num, 64, 64, 3])
 
     @tf.function

@@ -23,6 +23,7 @@ def _post_process(image, model):
         image = tf.sigmoid(image)
         image = image * 255
         image = tf.cast(image, tf.uint8)
+        image = tf.reshape(image, shape=[-1, 28, 28, 1])
         return image
     raise ValueError('Model {} is not supported.'.format(model))
 
