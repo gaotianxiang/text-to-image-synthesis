@@ -35,8 +35,8 @@ def _process_flow_mnist(image, label):
     image = tf.expand_dims(image, axis=-1)
     label = tf.one_hot(label, 10)
     image = ((image * 2 - 1) * 0.9 + 1) / 2
-    image = tf.math.log(image) / tf.math.log(1 - image)
-    return image, label
+    image = tf.math.log(image) - tf.math.log(1 - image)
+    return image, label, 0
 
 
 def _process_rgb_images(image, embedding, caption):
