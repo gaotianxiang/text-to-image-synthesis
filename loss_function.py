@@ -100,14 +100,20 @@ class FlowLoss:
         Returns:
 
         """
-        _, h, w, d = res.get_shape()
+        shape = res.get_shape()
+        if len(shape) == 2:
+            axis = [1]
+            dims = shape[-1]
+        else:
+            axis = [1, 2, 3]
+            dims = tf.reduce_prod(shape[1:])
         log_prob = -0.5 * (tf.square(res)) + tf.math.log(2 * np.pi)
-        log_prob = tf.reduce_sum(log_prob, axis=[1, 2, 3])
+        log_prob = tf.reduce_sum(log_prob, axis=axis)
         log_prob = tf.reduce_mean(log_prob)
-        log_det = tf.reduce_sum(log_det, axis=[1, 2, 3])
+        log_det = tf.reduce_sum(log_det, axis=axis)
         log_det = tf.reduce_mean(log_det)
         total_loss = -(log_prob + log_det)
-        bpd = total_loss / (h * w * d * tf.math.log(2.0))
+        bpd = total_loss / (dims * tf.math.log(2.0))
         return -log_prob, -log_det, total_loss, bpd
 
 

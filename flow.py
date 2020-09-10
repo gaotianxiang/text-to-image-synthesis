@@ -81,36 +81,37 @@ class BatchNorm(tf.keras.layers.Layer):
             return image_hat, log_det
 
 
-class ClassConditionedConvAffineCouplingLayer(tf.keras.layers.Layer):
+class ClassConditionedAffineCouplingLayer(tf.keras.layers.Layer):
     """Class conditioned convolutional affine coupling layer.
 
     Attributes:
         _mask
         _use_condition:
-        _hidden_conv:
         _log_scale:
         _shift:
     """
 
-    def __init__(self, num_channels_hidden, mask, use_condition):
+    def __init__(self, hidden_size, mask, use_condition):
         """Initializes the object.
 
         Args:
-            num_channels_hidden:
+            hidden_size:
             mask:
             use_condition:
         """
         super().__init__()
         self._mask = mask
         self._use_condition = use_condition
-        self._hidden_conv = tf.keras.Sequential([
-            layer for num in num_channels_hidden for layer in
-            [tf.keras.layers.Conv2D(num, kernel_size=[5, 5], padding='same', activation='relu', use_bias=False),
-             tf.keras.layers.BatchNormalization()]
+        self._log_scale = tf.keras.Sequential([
+            tf.keras.layers.Dense(hidden_size, activation='relu'),
+            tf.keras.layers.Dense(hidden_size, activation='relu'),
+            tf.keras.layers.Dense(784, activation='tanh')
         ])
-        self._log_scale = tf.keras.layers.Conv2D(1, kernel_size=[5, 5], padding='same', use_bias=False,
-                                                 activation='tanh')
-        self._shift = tf.keras.layers.Conv2D(1, kernel_size=[5, 5], padding='same', use_bias=False)
+        self._shift = tf.keras.Sequential([
+            tf.keras.layers.Dense(hidden_size, activation='relu'),
+            tf.keras.layers.Dense(hidden_size, activation='relu'),
+            tf.keras.layers.Dense(784)
+        ])
 
     def call(self, image, embedding, reverse=False):
         """Applies the layer to the inputs.
@@ -123,16 +124,13 @@ class ClassConditionedConvAffineCouplingLayer(tf.keras.layers.Layer):
         Returns:
 
         """
-        if self._use_condition:
-            embedding = tf.reshape(embedding, shape=[-1, 1, 1, 10])
-            embedding = tf.tile(embedding, multiples=[1, 28, 28, 1])
-            x = tf.concat([image, embedding], axis=-1)
-        else:
-            x = image
-
         mask = self._mask
-        masked_inputs = x * mask
-        x = self._hidden_conv(masked_inputs)
+        masked_image = image * mask
+        if self._use_condition:
+            x = tf.concat([masked_image, embedding], axis=-1)
+        else:
+            x = masked_image
+
         log_scale = self._log_scale(x) * (1 - mask)
         shift = self._shift(x) * (1 - mask)
 
@@ -160,25 +158,25 @@ class ClassConditionedFlow(tf.keras.layers.Layer):
         """
         super().__init__()
         self._use_condition = use_condition
-        self._model = self._get_coupling_layers(num_layers=8, num_channels_hidden=[64, 64, 64])
+        self._model = self._get_coupling_layers(num_layers=5, hidden_size=1024)
 
-    def _get_coupling_layers(self, num_layers, num_channels_hidden):
+    def _get_coupling_layers(self, num_layers, hidden_size):
         """Returns a list of convolutional affine coupling layers.
 
         Args:
             num_layers:
-            num_channels_hidden:
+            hidden_size:
 
         Returns:
 
         """
         mask = tf.range(784, dtype=tf.float32)
-        mask = tf.reshape(mask, shape=[28, 28, 1])
+        mask = tf.expand_dims(mask, axis=0)
         mask = mask % 2
         layers = []
 
         for _ in range(num_layers):
-            layers.append(ClassConditionedConvAffineCouplingLayer(num_channels_hidden, mask, self._use_condition))
+            layers.append(ClassConditionedAffineCouplingLayer(hidden_size, mask, self._use_condition))
             layers.append(BatchNorm())
             mask = 1 - mask
         return layers

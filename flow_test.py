@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 from flow import BatchNorm
-from flow import ClassConditionedConvAffineCouplingLayer
+from flow import ClassConditionedAffineCouplingLayer
 from flow import ClassConditionedFlow
 from flow import EmbeddingConditionedConvAffineCouplingLayer
 from flow import EmbeddingConditionedFlow
@@ -13,38 +13,37 @@ class FlowTest(tf.test.TestCase):
         self.batch_size = 32
         self.compression_size = 128
 
-    def test_class_conditioned_conv_affine_coupling_layer_non_conditional(self):
+    def test_class_conditioned_affine_coupling_layer_non_conditional(self):
         mask = tf.range(784, dtype=tf.float32)
-        mask = tf.reshape(mask, shape=[28, 28, 1]) % 2
-        image = tf.random.normal([self.batch_size, 28, 28, 1])
+        mask = tf.reshape(mask, shape=[1, 784]) % 2
+        image = tf.random.normal([self.batch_size, 784])
         embedding = tf.random.normal([self.batch_size, 10])
 
-        model = ClassConditionedConvAffineCouplingLayer(num_channels_hidden=[32, 32], mask=mask, use_condition=False)
+        model = ClassConditionedAffineCouplingLayer(hidden_size=1024, mask=mask, use_condition=False)
         res_forward, logdet_forward = model(image, embedding, reverse=False)
         res_backward, logdet_backward = model(res_forward, embedding, reverse=True)
         self.assertAllClose(res_backward, image)
         self.assertAllClose(logdet_forward, -logdet_backward)
 
-        model = ClassConditionedConvAffineCouplingLayer(num_channels_hidden=[32, 32], mask=1 - mask,
-                                                        use_condition=False)
+        model = ClassConditionedAffineCouplingLayer(hidden_size=1024, mask=1 - mask, use_condition=False)
         res_forward, logdet_forward = model(image, embedding, reverse=False)
         res_backward, logdet_backward = model(res_forward, embedding, reverse=True)
         self.assertAllClose(res_backward, image)
         self.assertAllClose(logdet_forward, -logdet_backward)
 
-    def test_class_conditioned_conv_affine_coupling_layer_conditional(self):
+    def test_class_conditioned_affine_coupling_layer_conditional(self):
         mask = tf.range(784, dtype=tf.float32)
-        mask = tf.reshape(mask, shape=[28, 28, 1]) % 2
-        image = tf.random.normal([self.batch_size, 28, 28, 1])
+        mask = tf.reshape(mask, shape=[1, 784]) % 2
+        image = tf.random.normal([self.batch_size, 784])
         embedding = tf.random.normal([self.batch_size, 10])
 
-        model = ClassConditionedConvAffineCouplingLayer(num_channels_hidden=[32, 32], mask=mask, use_condition=True)
+        model = ClassConditionedAffineCouplingLayer(hidden_size=1024, mask=mask, use_condition=True)
         res_forward, logdet_forward = model(image, embedding, reverse=False)
         res_backward, logdet_backward = model(res_forward, embedding, reverse=True)
         self.assertAllClose(res_backward, image)
         self.assertAllClose(logdet_forward, -logdet_backward)
 
-        model = ClassConditionedConvAffineCouplingLayer(num_channels_hidden=[32, 32], mask=1 - mask, use_condition=True)
+        model = ClassConditionedAffineCouplingLayer(hidden_size=1024, mask=1 - mask, use_condition=True)
         res_forward, logdet_forward = model(image, embedding, reverse=False)
         res_backward, logdet_backward = model(res_forward, embedding, reverse=True)
         self.assertAllClose(res_backward, image)
@@ -95,7 +94,7 @@ class FlowTest(tf.test.TestCase):
         self.assertAllClose(logdet_forward, -logdet_backward)
 
     def test_class_conditioned_flow_non_conditional(self):
-        image = tf.random.normal([self.batch_size, 28, 28, 1])
+        image = tf.random.normal([self.batch_size, 784])
         embedding = tf.random.normal([self.batch_size, 10])
 
         model = ClassConditionedFlow(use_condition=False)
@@ -105,12 +104,12 @@ class FlowTest(tf.test.TestCase):
         self.assertAllClose(logdet_forward, -logdet_backward)
 
     def test_class_conditioned_flow_conditional(self):
-        image = tf.random.normal([self.batch_size, 28, 28, 1])
+        image = tf.random.normal([self.batch_size, 784])
         embedding = tf.random.normal([self.batch_size, 10])
 
         model = ClassConditionedFlow(use_condition=True)
-        res_forward, logdet_forward = model(image, embedding, reverse=False)
-        res_backward, logdet_backward = model(res_forward, embedding, reverse=True)
+        res_forward, logdet_forward = model(image, embedding, reverse=False, training=False)
+        res_backward, logdet_backward = model(res_forward, embedding, reverse=True, training=False)
         self.assertAllClose(res_backward, image)
         self.assertAllClose(logdet_forward, -logdet_backward)
 
