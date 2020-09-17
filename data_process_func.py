@@ -71,7 +71,7 @@ def _process_flow_rgb_images(image, embedding, caption):
     image = (image + tf.random.uniform(tf.shape(image))) / 256
     image = tf.image.resize(image, [64, 64])
     image = ((image * 2 - 1) * 0.9 + 1) / 2
-    image = tf.math.log(image) / tf.math.log(1 - image)
+    image = tf.math.log(image) - tf.math.log(1 - image)
     return image, embedding, caption
 
 
@@ -109,7 +109,7 @@ def _process_flow_rgb_images_make_sure_3_channels(image, embedding, caption):
     image = (image + tf.random.uniform(tf.shape(image))) / 256
     image = tf.image.resize(image, [64, 64])
     image = ((image * 2 - 1) * 0.9 + 1) / 2
-    image = tf.math.log(image) / tf.math.log(1 - image)
+    image = tf.math.log(image) - tf.math.log(1 - image)
     return image, embedding, caption
 
 
