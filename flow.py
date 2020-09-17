@@ -310,6 +310,7 @@ class EmbeddingConditionedFlow(tf.keras.layers.Layer):
         for _ in range(num_layers):
             layers.append(EmbeddingConditionedConvAffineCouplingLayer(num_channels_hidden, compression_size, mask,
                                                                       self._use_condition))
+            layers.append(BatchNorm())
             mask = 1 - mask
         return layers
 
