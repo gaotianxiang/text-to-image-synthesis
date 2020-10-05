@@ -107,6 +107,7 @@ class FlowLoss:
         else:
             axis = [1, 2, 3]
             dims = tf.reduce_prod(shape[1:])
+        dims = tf.cast(dims, tf.float32)
         log_prob = -0.5 * (tf.square(res)) + tf.math.log(2 * np.pi)
         log_prob = tf.reduce_sum(log_prob, axis=axis)
         log_prob = tf.reduce_mean(log_prob)
