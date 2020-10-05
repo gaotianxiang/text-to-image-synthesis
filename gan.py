@@ -331,7 +331,7 @@ class GAN(Model):
 
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
             fake_image = self._generator(noise, embedding, training=True)
-            
+
             real_img_real_caption = self._discriminator(image, embedding, training=True)
             fake_img_real_caption = self._discriminator(fake_image, embedding, training=True)
 
