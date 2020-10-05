@@ -25,6 +25,8 @@ def get_optimizer(model, learning_rate):
                 GAN_DISC_OPTIM: tf.keras.optimizers.Adam(learning_rate, beta_1=0.5)}
     elif model == 'vae':
         return tf.keras.optimizers.Adam(learning_rate)
+    elif model == 'flow':
+        return tf.keras.optimizers.Adam(learning_rate)
     raise ValueError('Model {} is not supported.'.format(model))
 
 

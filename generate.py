@@ -19,7 +19,7 @@ flags.DEFINE_integer('shuffle', default=0, help='Dataset shuffle buffer size. Ze
 flags.DEFINE_integer('batch_size', default=64, help='Batch size.')
 flags.DEFINE_bool('drop_remainder', default=True, help='Whether to drop remainder in the data loader.')
 flags.DEFINE_enum('preprocess', default=None,
-                  enum_values=['mnist', 'image', 'image_make_sure_3_channels'],
+                  enum_values=['mnist', 'image', 'image_make_sure_3_channels', 'mnist_flow', 'rgb_flow', 'rgb_flow_3'],
                   help='Number of channels of the dataset images.')
 
 flags.DEFINE_enum('model', default=None, enum_values=['gan', 'vae', 'flow'], help='Which type of model will be used.')
@@ -31,7 +31,7 @@ flags.DEFINE_integer('noise_size', default=100,
                      help='Size of noise vectors. Used in GAN and VAE. Ignored if the model is flow.')
 flags.DEFINE_integer('compression_size', default=128, help='Size to which the embedding vectors will be projected to.')
 
-flags.DEFINE_enum('visualize_tool', default='fake_only', enum_values=['fake_only', 'fake_real'],
+flags.DEFINE_enum('visualize_tool', default='fake_only', enum_values=['fake_only', 'fake_real', 'real_only'],
                   help='Which visualize model to use.')
 flags.DEFINE_string('output_dir', default=None, help='Directory to which the generated images will be stored.')
 flags.DEFINE_integer('num', default=64, help='Number of samplings. Ignored if the use_condition is true.')

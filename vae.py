@@ -9,9 +9,9 @@ from model_interface import Model
 
 
 class ClassConditionedEncoder(tf.keras.layers.Layer):
-    """Class conditioned generator.
+    """Class conditioned encoder.
 
-    This generator is used by MNIST and FMNIST dataset.
+    This encoder is used by MNIST and FMNIST dataset.
 
     Attributes:
         _use_condition:
@@ -67,9 +67,9 @@ class ClassConditionedEncoder(tf.keras.layers.Layer):
 
 
 class EmbeddingConditionedEncoder(tf.keras.layers.Layer):
-    """Embedding conditioned generator.
+    """Embedding conditioned encoder.
 
-    This generator is used by UCB, Flowers, and MSCOCO datasets.
+    This encoder is used by UCB, Flowers, and MSCOCO datasets.
 
     Attributes:
         _use_condition:
@@ -146,9 +146,9 @@ def _get_encoder(dtst_name, use_condition, noise_sie, compression_size):
 
 
 class ClassConditionedDecoder(tf.keras.layers.Layer):
-    """Class conditioned discriminator.
+    """Class conditioned decoder.
 
-    This discriminator is used by MNIST and FMNIST datasets.
+    This decoder is used by MNIST and FMNIST datasets.
 
     Attributes:
         _use_condition:
@@ -199,9 +199,9 @@ class ClassConditionedDecoder(tf.keras.layers.Layer):
 
 
 class EmbeddingConditionedDecoder(tf.keras.layers.Layer):
-    """Embedding conditioned discriminator.
+    """Embedding conditioned decoder.
 
-    This discriminator is used by CUB, Flowers, MSCOCO datasets.
+    This decoder is used by CUB, Flowers, MSCOCO datasets.
 
     Attributes:
 
@@ -259,7 +259,7 @@ class EmbeddingConditionedDecoder(tf.keras.layers.Layer):
 
 
 def _get_decoder(dtst_name, use_condition, compression_size):
-    """Returns discriminator.
+    """Returns a decoder.
 
     Args:
         dtst_name:
@@ -275,7 +275,7 @@ def _get_decoder(dtst_name, use_condition, compression_size):
 
 
 class VAE(Model):
-    """Generative Adversarial Network.
+    """Variational auto encoder.
 
     Attributes:
         _encoder:
