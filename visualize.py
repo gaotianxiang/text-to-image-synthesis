@@ -121,6 +121,26 @@ def _fake_real_visualize(fake_img, real_img, caption, num, num_per_caption, num_
     return fake_img, grid
 
 
+def _real_fake_caption(fake_img, real_img, caption, num, num_per_caption, num_per_row, model):
+    """Visualizes the fake and real images and writes captions into a text file.
+
+    Args:
+        fake_img:
+        real_img:
+        caption:
+        num:
+        num_per_caption:
+        num_per_row:
+        model:
+
+    Returns:
+
+    """
+
+    fake_img, grid = _fake_real_visualize(fake_img, real_img, caption, num, num_per_caption, num_per_row, model)
+    return fake_img, grid, caption
+
+
 def get_visualize_tool(mode):
     if mode == 'fake_only':
         return _fake_only_visualize
@@ -128,4 +148,6 @@ def get_visualize_tool(mode):
         return _fake_real_visualize
     elif mode == 'real_only':
         return _real_only_visualize
+    elif mode == 'real_fake_caption':
+        return _real_fake_caption
     raise ValueError('Visualize model {} is not supported.')

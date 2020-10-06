@@ -95,20 +95,27 @@ def _get_iterations(optimizer):
     return optimizer.iterations
 
 
-def _save_img(fake_image, grid, output_dir):
+def _save_img(visual_results, output_dir):
     """Saves images to file.
 
     Args:
-        fake_image:
-        grid:
+        visual_results: if the length of visual_results is three, then it has the captions as the third term
         output_dir:
 
     Returns:
 
     """
-    file_name = '{}.jpg'.format(datetime.now().strftime("%Y-%b-%d-%H-%M-%S"))
+    file_name = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    if len(visual_results) == 2:
+        fake_img, grid = visual_results
+        caption = None
+    else:
+        fake_image, grid, caption = visual_results
     file = tf.image.encode_jpeg(grid)
-    tf.io.write_file(os.path.join(output_dir, file_name), file)
+    tf.io.write_file(os.path.join(output_dir, '{}.jpg'.format(file_name)), file)
+    if caption:
+        tf.io.write_file(os.path.join(output_dir, '{}.txt'.format(file_name)),
+                         tf.strings.reduce_join(caption, separator='\n'))
 
 
 def train(model, loss_func, metrics, optimizer, data_loader, ckpt_manager, summary_writer, num_epoch, print_interval):
@@ -161,5 +168,5 @@ def generate(model, data_loader, num, num_per_caption, visualize_tool, num_per_r
     """
     real_img, embedding, caption = next(data_loader.as_numpy_iterator())
     fake_img = model.generate(embedding, num, num_per_caption)
-    fake_img, grid = visualize_tool(fake_img, real_img, caption, num, num_per_caption, num_per_row, str(model))
-    _save_img(fake_img, grid, output_dir)
+    visual_results = visualize_tool(fake_img, real_img, caption, num, num_per_caption, num_per_row, str(model))
+    _save_img(visual_results, output_dir)

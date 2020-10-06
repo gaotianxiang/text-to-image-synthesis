@@ -31,7 +31,8 @@ flags.DEFINE_integer('noise_size', default=100,
                      help='Size of noise vectors. Used in GAN and VAE. Ignored if the model is flow.')
 flags.DEFINE_integer('compression_size', default=128, help='Size to which the embedding vectors will be projected to.')
 
-flags.DEFINE_enum('visualize_tool', default='fake_only', enum_values=['fake_only', 'fake_real', 'real_only'],
+flags.DEFINE_enum('visualize_tool', default='fake_only',
+                  enum_values=['fake_only', 'fake_real', 'real_only', 'real_fake_caption'],
                   help='Which visualize model to use.')
 flags.DEFINE_string('output_dir', default=None, help='Directory to which the generated images will be stored.')
 flags.DEFINE_integer('num', default=64, help='Number of samplings. Ignored if the use_condition is true.')
